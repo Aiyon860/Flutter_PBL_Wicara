@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobile_pbl/home.dart';
 import 'package:image_picker/image_picker.dart';
+import 'custom_color.dart';
 import 'respon_aduan.dart';
 import 'dart:convert'; // Tambahkan ini
 import 'package:http/http.dart' as http;
@@ -29,6 +30,7 @@ class Laporan {
   String judul;
   String deskripsi;
   String jenisPengaduan;
+  String namaInstansi;
   String lokasi;
   bool anonim; // Pastikan ini ada
   String? filePath;
@@ -37,11 +39,49 @@ class Laporan {
     required this.judul,
     required this.deskripsi,
     required this.jenisPengaduan,
+    required this.namaInstansi,
     required this.lokasi,
     required this.anonim,
     this.filePath,
   });
 }
+
+class Instansi {
+  final String id;
+  final String name;
+
+  Instansi({
+    required this.id,
+    required this.name,
+  });
+
+  // Factory constructor to create an instance from a map
+  factory Instansi.fromJson(Map<String, dynamic> json) {
+    return Instansi(
+      id: json['id'] as String,
+      name: json['name'] as String,
+    );
+  }
+}
+
+class JenisPengaduan {
+  final String id;
+  final String name;
+
+  JenisPengaduan({
+    required this.id,
+    required this.name,
+  });
+
+  // Factory constructor to create an instance from a map
+  factory JenisPengaduan.fromJson(Map<String, dynamic> json) {
+    return JenisPengaduan(
+      id: json['id'] as String,
+      name: json['name'] as String,
+    );
+  }
+}
+
 
 class CreateAduanForm extends StatefulWidget {
   const CreateAduanForm({super.key});
@@ -52,10 +92,10 @@ class CreateAduanForm extends StatefulWidget {
 
 class _CreateAduanFormState extends State<CreateAduanForm> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
-  String _nama = '';
+  final String _nama = '';
   String _judul = '';
   String _desc = '';
-  String _jenis = '';
+  final String _jenis = '';
   String dropdownvalue = 'Item 1';
 
   final TextEditingController _judulController = TextEditingController();
@@ -63,17 +103,74 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
   final TextEditingController _lokasiController = TextEditingController();
   bool _anonim = false;
   File? _selectedImage;
-  String? _selectedItem; // Menyimpan nilai dropdown
-  List<Map<String, String>> jenisPengaduan = [
-    {'id': '1', 'name': 'Bullying'},
-    {'id': '2', 'name': 'Kerusakan Fasilitas'},
-    {'id': '3', 'name': 'Kekerasan Seksual'},
-    // Tambahkan jenis pengaduan lainnya
-  ];
+  String? _selectedItemJenisPengaduan; // Menyimpan nilai dropdown
+  String? _selectedItemInstansi; // Menyimpan nilai dropdown
+  List<JenisPengaduan> jenisPengaduan = [];
+  List<Instansi> instansi = [];
+
+  Future<bool> fetchJenisPengaduan() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception('Token tidak ditemukan di SharedPreferences');
+    }
+
+    Uri uri = Uri.parse(
+        "http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/tampil_jenis_pengaduan_form_aduan_app.php");
+
+    final response = await http.post(
+      uri,
+      headers: {'Content-Type': "application/x-www-form-urlencoded"},
+      body: {'token': token },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body)["data"];
+      setState(() {
+        jenisPengaduan =
+            data.map((item) => JenisPengaduan.fromJson(item)).toList();
+      });
+      return true;
+    } else {
+      print('Error: ${response.statusCode}');
+      return false;
+    }
+  }
+
+  Future<bool> fetchInstansi() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception('Token tidak ditemukan di SharedPreferences');
+    }
+
+    Uri uri = Uri.parse(
+        "http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/tampil_instansi_form_aduan_app.php");
+
+    final response = await http.post(
+      uri,
+      headers: {'Content-Type': "application/x-www-form-urlencoded"},
+      body: {'token': token },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body)["data"];
+      setState(() {
+        instansi =
+            data.map((item) => Instansi.fromJson(item)).toList();
+      });
+      return true;
+    } else {
+      print('Error: ${response.statusCode}');
+      return false;
+    }
+  }
 
   void _submitForm() async {
     // Memastikan jenis pengaduan dipilih
-    if (_selectedItem == null) {
+    if (_selectedItemJenisPengaduan == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Silakan pilih jenis pengaduan.')),
       );
@@ -84,7 +181,8 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
     Laporan laporan = Laporan(
       judul: _judulController.text,
       deskripsi: _deskripsiController.text,
-      jenisPengaduan: _selectedItem!,
+      jenisPengaduan: _selectedItemJenisPengaduan!,
+      namaInstansi: _selectedItemInstansi!,
       lokasi: _lokasiController.text,
       anonim: _anonim, // Pastikan ini benar
       filePath: _selectedImage?.path,
@@ -145,10 +243,13 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
       },
     );
   }
+
   @override
   void initState() {
     super.initState();
     checkToken(); // Panggil checkToken untuk mengecek token di terminal saat laman ini dibuka
+    fetchInstansi();
+    fetchJenisPengaduan();
   }
 
   Future<void> checkToken() async {
@@ -170,7 +271,10 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
       appBar: AppBar(
         title: const Text(
           'Buat Aduan',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+              color: Colors.white,
+              fontSize: 16
+          ),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -186,7 +290,7 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
             );
           },
         ),
-        backgroundColor: const Color(0xFF2879fe),
+        backgroundColor: CustomColor.darkBlue,
       ),
       body: ListView(
         padding: EdgeInsets.symmetric(
@@ -203,12 +307,6 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
                 child: Column(
                   children: <Widget>[
                     const SizedBox(height: 16),
-                    // // Judul Field
-                    // const Align(
-                    //   alignment: Alignment.centerLeft,
-                    //   child: Text('Judul'),
-                    // ),
-                    // const SizedBox(height: 5),
                     SizedBox(
                       width: screenWidth > 600
                           ? 400
@@ -247,8 +345,9 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
                           ),
                         ),
                         validator: (value) {
-                          if (value!.isEmpty)
+                          if (value!.isEmpty) {
                             return 'Please enter your description.';
+                          }
                           return null;
                         },
                         onSaved: (value) {
@@ -258,10 +357,10 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
-                      value: _selectedItem,
+                      value: _selectedItemJenisPengaduan,
                       onChanged: (String? value) {
                         setState(() {
-                          _selectedItem = value!;
+                          _selectedItemJenisPengaduan = value!;
                         });
                       },
                       decoration: const InputDecoration(
@@ -271,15 +370,43 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
                         ),
                       ),
                       items: jenisPengaduan.map<DropdownMenuItem<String>>(
-                          (Map<String, String> item) {
+                          (item) {
                         return DropdownMenuItem<String>(
-                          value: item['id'], // Simpan ID di sini
-                          child: Text(item['name']!),
+                          value: item.id, // Simpan ID di sini
+                          child: Text(item.name),
                         );
                       }).toList(),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please select Jenis Pengaduan.';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      value: _selectedItemInstansi,
+                      onChanged: (String? value) {
+                        setState(() {
+                          _selectedItemInstansi = value!;
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        labelText: "Instansi",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                        ),
+                      ),
+                      items: instansi.map<DropdownMenuItem<String>>(
+                          (item) {
+                        return DropdownMenuItem<String>(
+                          value: item.id, // Simpan ID di sini
+                          child: Text(item.name!),
+                        );
+                      }).toList(),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please select Instansi.';
                         }
                         return null;
                       },
@@ -323,7 +450,7 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
                                 height: 200, // Tinggi outer box
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                      color: const Color(0xFFF0F0F0),
+                                      color: Colors.black38,
                                       width: 1.3), // Outline border
                                   borderRadius: BorderRadius.circular(
                                       8), // Border radius untuk outer box
@@ -338,7 +465,7 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
                                                   150, // Inner box tetap 150x150
                                               height: 150,
                                               decoration: BoxDecoration(
-                                                color: const Color(0xFF2879fe),
+                                                color: CustomColor.darkBlue,
                                                 borderRadius:
                                                     BorderRadius.circular(10),
                                               ),
@@ -381,15 +508,6 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
                                                 ),
                                               ),
                                             ),
-                                      const SizedBox(height: 10),
-                                      Text(
-                                        _selectedImage == null
-                                            ? "No image uploaded"
-                                            : _selectedImage!.path
-                                                .split('/')
-                                                .last,
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
                                     ],
                                   ),
                                 ),
@@ -424,11 +542,12 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
 
                     // Tombol Kirim
                     Container(
+                      margin: EdgeInsets.only(bottom: 32),
                       width: screenWidth > 600
                           ? 300
                           : double.infinity, // Lebar responsif
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2879fe),
+                        color: CustomColor.goldColor,
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: TextButton(
@@ -442,7 +561,10 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
                         },
                         child: const Text(
                           'Kirim',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(
+                              color: CustomColor.blackColor,
+                              fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -480,7 +602,7 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
 }
 
 Future<bool> kirimLaporan(Laporan laporan) async {
-  var url = Uri.parse('http://10.0.2.2/wicara/backend/api/mobile/simpan_aduan_app.php');  
+  var url = Uri.parse('http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/simpan_aduan_app.php');
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? token = prefs.getString('token'); // Ambil token yang tersimpan
@@ -491,6 +613,7 @@ Future<bool> kirimLaporan(Laporan laporan) async {
   request.fields['judul'] = laporan.judul;
   request.fields['deskripsi'] = laporan.deskripsi;
   request.fields['jenis_pengaduan'] = laporan.jenisPengaduan;
+  request.fields['nama_instansi'] = laporan.namaInstansi;
   request.fields['lokasi'] = laporan.lokasi;
   request.fields['anonim'] = laporan.anonim ? '1' : '0';
   request.fields['token'] = token ?? ''; // Token ditambahkan sebagai field di body

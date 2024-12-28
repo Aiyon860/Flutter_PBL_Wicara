@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_mobile_pbl/notification_page.dart';
+import 'package:flutter_mobile_pbl/dashboard_kehilangan.dart';
+import 'package:flutter_mobile_pbl/form_kehilangan.dart';
+import 'package:flutter_mobile_pbl/dashboard_notifikasi.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import "custom_color.dart";
-import "buat_aduan.dart";
+import "form_aduan.dart";
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'detail_unit_layanan.dart';
@@ -46,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List unitLayanan = [];
   List aduanTerbaru = [];
   List userData = [];
+  int jumlahNotifikasi = 0;
 
   final List<String> imagePaths = [
     "images/dashboard_slide1.png",
@@ -74,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => const CreateKehilanganForm()),
         );
         _selectedIndex = 0;
         break;
@@ -127,6 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchDataUnitLayanan();
     fetchDataAduanTerbaru();
     fetchUserDataHome();
+    fetchNotificationsCount();
   }
 
   @override
@@ -154,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: _buildDrawer(),
       appBar: AppBar(
           backgroundColor: CustomColor.primaryColor,
-          title: TopBar(userData: userData),
+          title: TopBar(userData: userData, jumlahNotifikasi: jumlahNotifikasi),
           leading: Builder(builder: (BuildContext context) {
             return IconButton(
               icon: const Icon(
@@ -166,7 +170,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 Scaffold.of(context).openDrawer();
               },
             );
-          })),
+          }),
+      ),
       body: SingleChildScrollView(
         controller: _scrollController,
         child: Column(
@@ -228,8 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: EdgeInsets.only(
                       top: (MediaQuery.of(context).size.height / 4) - 25),
                   child: SizedBox(
-                      width: double.infinity,
-                      height: MediaQuery.of(context).size.height * 2.2,
+                      width: MediaQuery.of(context).size.width,
                       child: Container(
                           decoration: const BoxDecoration(
                             color: CustomColor.bgColorHome,
@@ -242,27 +246,57 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text("Aduan Saya"),
+                                    const Text(
+                                        "Aduan Saya",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 25,
+                                        )
+                                    ),
                                     const SizedBox(height: 10),
-                                    ...List.generate(aduanTerbaru.length,
-                                        (index) {
-                                      final aduan = aduanTerbaru[index];
-                                      return _buildPreviewAduanSaya(
-                                          index + 1,
-                                          aduan["judul"],
-                                          aduan["nama_jenis_pengaduan"],
-                                          aduan["tanggal"],
-                                          aduan["nama_status_pengaduan"],
-                                          aduan["lampiran"]);
-                                    }),
-                                    _buildTampilkanLebihBanyakButton(const AduanPage()),
+                                    aduanTerbaru.isEmpty
+                                        ? Padding(
+                                          padding: const EdgeInsets.only(top: 16.0),
+                                          child: const Center(
+                                            child: Text(
+                                          "Tidak ada aduan",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.grey,
+                                          ),
+                                                                                ),
+                                                                              ),
+                                        )
+                                        :
+                                    Column(
+                                      children: [
+                                        ...List.generate(aduanTerbaru.length, (index) {
+                                          final aduan = aduanTerbaru[index];
+                                          return _buildPreviewAduanSaya(
+                                            index + 1,
+                                            aduan["judul"],
+                                            aduan["nama_jenis_pengaduan"],
+                                            aduan["tanggal"],
+                                            aduan["nama_status_pengaduan"],
+                                            aduan["lampiran"],
+                                            aduan["image_exist"],
+                                          );
+                                        }),
+                                        _buildTampilkanLebihBanyakButton(const AduanPage()),
+                                      ],
+                                    ),
                                     const SizedBox(height: 30),
                                     Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        const Text("Lihat Aduan"),
-                                        const SizedBox(height: 10),
+                                        const Text(
+                                            "Lihat Aduan dan Laporan",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 25,
+                                            )
+                                        ),
                                         Container(
                                             height: MediaQuery.of(context)
                                                     .size
@@ -270,8 +304,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 6,
                                             width: double.infinity,
                                             decoration: const BoxDecoration(
-                                              color: CustomColor
-                                                  .liatAduanSayaBgColor,
                                               borderRadius: BorderRadius.all(
                                                   Radius.circular(15)),
                                             ),
@@ -282,20 +314,32 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   CrossAxisAlignment.end,
                                               children: [
                                                 _buildMenuLihatAduan(
-                                                  "images/aduan_ulasan.png",
                                                   "Aduan\nSaya",
+                                                  const Color(0xFF124098),
+                                                  Colors.white,
+                                                  Icons.assignment,
+                                                  const Color(0x55F2E9FF),
+                                                  "circle_stripe.png",
                                                   const AduanPage(),
                                                 ),
                                                 const SizedBox(width: 10),
                                                 _buildMenuLihatAduan(
-                                                  "images/jarkom.png",
                                                   "Jarkom\nKehilangan",
-                                                  const CreateAduanForm(),
+                                                  const Color(0xFFFFB903),
+                                                  Colors.black,
+                                                  Icons.announcement,
+                                                  const Color(0xDDFFF1CE),
+                                                  "oval_vertical_ascending.png",
+                                                  const LostItemsScreen(),
                                                 ),
                                                 const SizedBox(width: 10),
                                                 _buildMenuLihatAduan(
-                                                  "images/aduan_ulasan.png",
-                                                  "Rating\nUnit Layanan",
+                                                  "Rating\nInstansi",
+                                                  const Color(0xFF191919),
+                                                  Colors.white,
+                                                  Icons.thumb_up,
+                                                  const Color(0x55F2E9FF),
+                                                  "circles_dots.png",
                                                   const QRScannerScreen(),
                                                 ),
                                               ],
@@ -307,17 +351,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          const Text("Rating Unit Layanan"),
+                                          const Text(
+                                              "Unit Layanan",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 25,
+                                              )
+                                          ),
                                           const SizedBox(height: 10),
                                           Column(children: [
                                             ...List.generate(3,
                                                 (index) {
                                               final unit = unitLayanan[index];
                                               return _buildUnitLayananPreview(
+                                                  index + 1,
                                                   unit["nama_instansi"],
                                                   unit["website"],
-                                                  unit["rata_rata_rating"] == 0.0 ? 0.0 : double.parse(unit["rata_rata_rating"]),
+                                                  unit["rata_rata_rating"] == 0 ? 0 : int.parse(unit["rata_rata_rating"]),
                                                   unit["total_rating"] == 0 ? 0 : int.parse(unit["total_rating"]),
+                                                  unit["gambar_instansi"],
                                                 );
                                             }),
                                             // _buildTampilkanLebihBanyakButton(),
@@ -384,6 +436,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        enableFeedback: true,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
@@ -395,7 +448,7 @@ class _HomeScreenState extends State<HomeScreen> {
         iconSize: 30,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
+            icon: Icon(Icons.home),
             label: 'Home',
           ),
           BottomNavigationBarItem(
@@ -420,13 +473,53 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<bool> fetchDataUnitLayanan() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception('Token tidak ditemukan di SharedPreferences');
+    }
+
     Uri uri = Uri.parse(
-        "http://10.0.2.2/wicara/backend/api/mobile/ambil_data_unit_layanan_home_app.php");
-    final response = await http.get(uri);
+        "http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_unit_layanan_home_app.php");
+
+    final response = await http.post(
+      uri,
+      headers: {'Content-Type': "application/x-www-form-urlencoded"},
+      body: {'token': token },
+    );
 
     if (response.statusCode == 200) {
       setState(() {
-        unitLayanan = json.decode(response.body);
+        unitLayanan = json.decode(response.body)["data"];
+      });
+      return true;
+    } else {
+      print('Error: ${response.statusCode}');
+      return false;
+    }
+  }
+
+  Future<bool> fetchNotificationsCount() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception('Token tidak ditemukan di SharedPreferences');
+    }
+
+    Uri uri = Uri.parse(
+        "http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/jumlah_notifikasi_app.php");
+
+    final response = await http.post(
+      uri,
+      headers: {'Content-Type': "application/x-www-form-urlencoded"},
+      body: {'token': token },
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        jumlahNotifikasi = json.decode(response.body)["data"];
       });
       return true;
     } else {
@@ -436,160 +529,190 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildUnitLayananPreview(
-    String nama, 
-    String website,
-    double rataRataRating,
-    int totalRating
+      int index,
+      String nama,
+      String website,
+      int rataRataRating,
+      int totalRating,
+      String lampiran
   ) {
-    String imagePath;
 
-    if (nama == "UPA TIK") {
-      imagePath = "images/upttik.png";
-    } else if (nama == "UPA Perpustakaan") {
-      imagePath = "images/perpus.jpg";
-    } else {
-      imagePath = "images/poliklinik.png";
-    }
-
-    return Container(
-        margin: const EdgeInsets.only(bottom: 10.0),
-        width: double.infinity,
-        height: (MediaQuery.of(context).size.height / 3),
-        decoration: BoxDecoration(
-            color: CustomColor.liatAduanSayaBgColor,
-            borderRadius: const BorderRadius.all(Radius.circular(15)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                spreadRadius: 5,
-                blurRadius: 7.5,
-                offset: const Offset(0, 2),
-              )
-            ]),
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(15),
-                      topRight: Radius.circular(15),
-                    ),
-                    child: Image(
-                      image: ExactAssetImage(imagePath),
-                      width: double.infinity,
-                      height: MediaQuery.of(context).size.height / 4,
-                      fit: BoxFit.cover,
-                    )),
-                Container(
-                  width: double.infinity,
-                  height: MediaQuery.of(context).size.height / 4,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [
-                        CustomColor.darkBlue.withOpacity(0.5),
-                        Colors.transparent
-                      ],
+    return InkWell(
+      onTap: () {
+        Future.delayed(const Duration(milliseconds: 100), () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UnitLayananScreen(idInstansi: index.toString()),
+            ),
+          );
+        });
+      },
+      child: Container(
+          margin: const EdgeInsets.only(bottom: 10.0),
+          width: double.infinity,
+          height: (MediaQuery.of(context).size.height / 3),
+          decoration: BoxDecoration(
+              color: CustomColor.liatAduanSayaBgColor,
+              borderRadius: const BorderRadius.all(Radius.circular(15)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.2),
+                  spreadRadius: 5,
+                  blurRadius: 7.5,
+                  offset: const Offset(0, 2),
+                )
+              ]),
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(15),
+                        topRight: Radius.circular(15),
+                      ),
+                      child: Image.network(
+                        "http://10.0.2.2/WICARA_FIX/Wicara_User_Web/assets/images/instansi/$lampiran",
+                        width: double.infinity,
+                        height: MediaQuery.of(context).size.height / 4,
+                        fit: BoxFit.cover,
+                      )),
+                  Container(
+                    width: double.infinity,
+                    height: MediaQuery.of(context).size.height / 4,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          CustomColor.darkBlue.withOpacity(0.6),
+                          Colors.transparent
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Positioned(
-                    bottom: 10,
-                    left: 10,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          nama,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 30,
-                          ),
-                        ),
-                        Text(
-                          website,
-                          style: const TextStyle(
-                            color: Colors.white,
-                          ),
-                        )
-                      ],
-                    ))
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        '$rataRataRating/5.0',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Column(
+                  Positioned(
+                      bottom: 10,
+                      left: 10,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: List.generate(5, (index) {
-                              return Icon(
-                                index < rataRataRating ? Icons.star : Icons.star_border,
-                                color: CustomColor.goldColor,
-                                size: 20,
-                              );
-                            }),
-                          ),
-                          const SizedBox(width: 5),
                           Text(
-                            '$totalRating Reviews',
+                            nama,
                             style: const TextStyle(
-                              fontSize: 16,
-                              color: CustomColor.liatAduanSayaFontColor,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 30,
                             ),
                           ),
+                          Text(
+                            website,
+                            style: const TextStyle(
+                              color: Colors.white,
+                            ),
+                          )
                         ],
-                      )
-                    ],
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const ServiceUnitPage()),
-                      );
-                    },
-                    child: const Row(
-                      children: [
-                        Text("Detail",
-                            style: TextStyle(
-                              color: Colors.black,
-                            )),
-                        Icon(
-                          Icons.chevron_right_outlined,
-                          color: Colors.black,
-                        ),
-                      ],
-                    ),
-                  )
+                      ))
                 ],
               ),
-            ),
-          ],
-        ));
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          '$rataRataRating/5',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Column(
+                          children: [
+                            Row(
+                              children: List.generate(5, (index) {
+                                return Icon(
+                                  index < rataRataRating ? Icons.star : Icons.star_border,
+                                  color: CustomColor.goldColor,
+                                  size: 20,
+                                );
+                              }),
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              '$totalRating Review' + (totalRating > 1 ? 's' : ''),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: CustomColor.liatAduanSayaFontColor,
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: CustomColor.goldColor,
+                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8), // Adjust padding
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20), // Optional: Adjust button shape
+                        ),
+                      ),
+                      onPressed: () {
+                        Future.delayed(const Duration(milliseconds: 100), () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UnitLayananScreen(idInstansi: index.toString()),
+                            ),
+                          );
+                        });
+                      },
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min, // Minimizes the width of the button
+                        children: [
+                          const Text(
+                            "Detail",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16, // Optional: Adjust font size
+                            ),
+                          ),
+                          const SizedBox(width: 4), // Adjust spacing between Text and Icon
+                          const Icon(
+                            Icons.chevron_right_outlined,
+                            color: Colors.black,
+                            size: 20, // Adjust size of the icon
+                          ),
+                        ],
+                      ),
+                    ),
+
+                  ],
+                ),
+              ),
+            ],
+          )),
+    );
   }
 
-  Widget _buildMenuLihatAduan(String path, String label, Widget nextPage) {
+  Widget _buildMenuLihatAduan(
+      String label,
+      Color backgroundColor,
+      Color textAndIconColor,
+      IconData icon,
+      Color circleColor,
+      String additionalDecorationPath,
+      Widget nextPage) {
     return Material(
-      color: Colors
-          .transparent, // Set background color to transparent for the ripple effect to be visible
+      borderRadius: BorderRadius.circular(20),
+      color: backgroundColor,
       child: InkWell(
         onTap: () {
           Navigator.push(
@@ -597,28 +720,70 @@ class _HomeScreenState extends State<HomeScreen> {
             MaterialPageRoute(builder: (context) => nextPage),
           );
         },
-        borderRadius: BorderRadius.circular(8), // Set radius for ripple effect
-        splashColor:
-            Colors.grey.withOpacity(0.3), // Customize ripple color if needed
+        borderRadius: BorderRadius.circular(20),
+        splashColor: Colors.grey.withOpacity(0.3),
         child: Container(
-          width: MediaQuery.of(context).size.width / 4,
+          width: MediaQuery.of(context).size.width / 3.6,
           height: MediaQuery.of(context).size.height / 7,
-          decoration: const BoxDecoration(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.asset(
-                path,
-                width: MediaQuery.of(context).size.width / 4,
-                height: (MediaQuery.of(context).size.height / 10) - 20,
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(height: 5),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-              ),
-            ],
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20), // Match the overall shape
+          ),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
+            child: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12.0), // Padding for text and icon
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: circleColor,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 10,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          icon,
+                          color: textAndIconColor,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        label,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: textAndIconColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  top: -10, // Align with the very top of the container
+                  right: 0, // Align with the right edge
+                  child: Opacity(
+                    opacity: (
+                        textAndIconColor != Colors.black ? 0.7 : 1.0),
+                    child: Image.asset(
+                      "images/$additionalDecorationPath",
+                      height: MediaQuery.of(context).size.height / 12,
+                      width: MediaQuery.of(context).size.width / 10,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -652,13 +817,25 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<bool> fetchDataAduanTerbaru() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception('Token tidak ditemukan di SharedPreferences');
+    }
+
     Uri uri = Uri.parse(
-        "http://10.0.2.2/wicara/backend/api/mobile/ambil_data_aduan_terbaru_app.php");
-    final response = await http.get(uri);
+        "http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_aduan_terbaru_app.php");
+
+    final response = await http.post(
+      uri,
+      headers: {'Content-Type': "application/x-www-form-urlencoded"},
+      body: {'token': token },
+    );
 
     if (response.statusCode == 200) {
       setState(() {
-        aduanTerbaru = json.decode(response.body);
+        aduanTerbaru = json.decode(response.body)["data"];
       });
       return true;
     } else {
@@ -685,6 +862,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String tanggal,
     String status,
     String lampiran,
+      bool imageExist,
   ) {
     Color selectedColor;
 
@@ -709,7 +887,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 10.0),
       width: double.infinity,
-      height: MediaQuery.of(context).size.height / 6,
       decoration: BoxDecoration(
           color: CustomColor.liatAduanSayaBgColor,
           borderRadius: const BorderRadius.all(Radius.circular(15)),
@@ -723,7 +900,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ]),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        child: Column(children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -751,9 +928,21 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 10),
           Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-            Image.asset(
-              "images/ac.png",
-              height: MediaQuery.of(context).size.height / 10,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10), // Set the border radius
+              child: imageExist
+                  ? Image.network(
+                    "http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/aduan/$lampiran",
+                    height: MediaQuery.of(context).size.height / 15,
+                    width: MediaQuery.of(context).size.width / 6.5,
+                    fit: BoxFit.cover,
+                  )
+                  : Image.asset(
+                    "images/image_default.png",
+                    height: MediaQuery.of(context).size.height / 15,
+                    width: MediaQuery.of(context).size.width / 6.5,
+                    fit: BoxFit.cover,
+                  ),
             ),
             const SizedBox(width: 10),
             Column(
@@ -818,6 +1007,10 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Container(
           width: MediaQuery.of(context).size.width * 0.85,
           decoration: const BoxDecoration(
+            borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20),
+            ),
             color: Colors.white,
             border: Border(
               bottom: BorderSide(
@@ -862,7 +1055,7 @@ class _HomeScreenState extends State<HomeScreen> {
       throw Exception('Token tidak ditemukan di SharedPreferences');
     }
 
-    Uri url = Uri.parse("http://10.0.2.2/wicara/backend/api/mobile/ambil_data_user_home_app.php");
+    Uri url = Uri.parse("http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_user_home_app.php");
     final response = await http.post(
       url,
       headers: {'Content-Type': "application/x-www-form-urlencoded"},
@@ -877,7 +1070,7 @@ class _HomeScreenState extends State<HomeScreen> {
       user["nama"] = dataProfile["nama"] ?? "Nama tidak ada";
       user["role"] = dataProfile["nama_role"] ?? "Role tidak ditemukan";
       user["profile"] = dataProfile["profile"] != null && dataProfile["profile"].isNotEmpty 
-        ? NetworkImage('http://10.0.2.2/wicara/backend/profile/${dataProfile["profile"]}')
+        ? NetworkImage('http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/profile/${dataProfile["profile"]}')
         : const AssetImage('images/image_default.png');
 
       setState(() {
@@ -967,12 +1160,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Widget> _buildMenuBodyDrawer() {
     return [
-      const ExpandableMenuItem(
-        title: 'Profile',
-        items: [], // Empty list for Profile since it has no sub-items
-      ),
       ExpandableMenuItem(
         title: 'Pengaduan',
+        icon: Icons.assignment, // Add this line
         items: [
           MenuItemData(
             title: 'Buat Aduan',
@@ -980,20 +1170,21 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           MenuItemData(
             title: 'Aduan Saya',
-            page: const AduanPage(), // TODO:placeholder
+            page: const AduanPage(),
           ),
         ],
       ),
       ExpandableMenuItem(
         title: 'Kehilangan',
+        icon: Icons.announcement, // Add this line
         items: [
           MenuItemData(
             title: 'Buat Laporan',
-            page: const CreateAduanForm(), // TODO:placeholder
+            page: const CreateKehilanganForm(),
           ),
           MenuItemData(
             title: 'Jarkom Kehilangan',
-            page: const CreateAduanForm(), // TODO:placeholder
+            page: const LostItemsScreen(),
           ),
         ],
       ),
@@ -1039,7 +1230,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 45),
+                const SizedBox(height: 35),
                 const Text(
                   "Jl. Prof. Sudarto, Tembalang, Kec. Tembalang, Kota Semarang, Jawa Tengah 50275",
                   style: TextStyle(
@@ -1049,12 +1240,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(height: 35),
-                Center(
-                  child: Text("Copyright @${DateTime.now().year} POLINES",
-                      style: const TextStyle(
-                        color: CustomColor.goldColor,
-                        fontSize: 10,
-                      )),
+                Row(
+                  children: [
+                    Text("Copyright @${DateTime.now().year} POLINES",
+                        style: const TextStyle(
+                          color: CustomColor.goldColor,
+                          fontSize: 10,
+                        )),
+                  ],
                 ),
               ],
             ),
@@ -1065,10 +1258,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class TopBar extends StatefulWidget {
   final List userData;
+  final int jumlahNotifikasi;
 
   const TopBar({
     super.key,
     required this.userData,
+    required this.jumlahNotifikasi,
   });
 
   @override
@@ -1083,48 +1278,82 @@ class _TopBarState extends State<TopBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      const SizedBox(width: 30),
-      ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildNotificationIcon(),
-              const SizedBox(width: 10),
-              _buildProfPicIcon(widget.userData),
-            ],
-          ))
-    ]);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // Add the "Home" text
+        const Padding(
+          padding: EdgeInsets.only(left: 4.0),
+          child: Text(
+            "Home",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        // Notification icon and profile picture on the right
+        Row(
+          children: [
+            _buildNotificationIcon(widget.jumlahNotifikasi),
+            const SizedBox(width: 10),
+            _buildProfPicIcon(widget.userData),
+          ],
+        ),
+      ],
+    );
   }
 
-  Widget _buildNotificationIcon() {
+
+  Widget _buildNotificationIcon(int notificationsCount) {
     return Container(
       decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          color: CustomColor.bgNotificationBell),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+        color: CustomColor.bgNotificationBell,
+      ),
       child: SizedBox(
-          height: 30,
-          width: 30,
-          child: IconButton(
-            padding: EdgeInsets.zero,
-            icon: const Icon(
-              Icons.notifications,
-              color: Color.fromARGB(255, 255, 255, 255),
-              size: 25,
+        height: 30,
+        width: 30,
+        child: Stack(
+          children: [
+            IconButton(
+              padding: EdgeInsets.zero,
+              icon: const Icon(
+                Icons.notifications,
+                color: Color.fromARGB(255, 255, 255, 255),
+                size: 25,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NotifikasiScreen()),
+                );
+              },
             ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  NotificationsPage()),
-              );
-            },
-          )),
+            // Add the orange circle
+            Positioned(
+              top: 5,
+              left: 5,
+              child: Container(
+                height: 10,
+                width: 10,
+                decoration: BoxDecoration(
+                  color: notificationsCount > 0 ? Colors.redAccent : Colors.transparent,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildProfPicIcon(List<dynamic> userData) {
     return InkWell(
+      borderRadius: const BorderRadius.all(Radius.circular(5)),
       onTap: () {
         Navigator.push(
           context,
@@ -1160,12 +1389,14 @@ class ImagePlaceholder extends StatelessWidget {
 class ExpandableMenuItem extends StatefulWidget {
   final String title;
   final List<MenuItemData> items;
+  final IconData icon; // Add this line
   final VoidCallback? onTitleTap;
 
   const ExpandableMenuItem({
     super.key,
     required this.title,
     required this.items,
+    required this.icon, // Add this line
     this.onTitleTap,
   });
 
@@ -1200,7 +1431,6 @@ class _ExpandableMenuItemState extends State<ExpandableMenuItem> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Main button
         InkWell(
           onTap: () {
             if (widget.items.isNotEmpty) {
@@ -1213,6 +1443,8 @@ class _ExpandableMenuItemState extends State<ExpandableMenuItem> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
+                Icon(widget.icon, size: 20), // Display the icon
+                const SizedBox(width: 8),
                 Text(
                   widget.title,
                   style: const TextStyle(
@@ -1220,7 +1452,6 @@ class _ExpandableMenuItemState extends State<ExpandableMenuItem> {
                   ),
                 ),
                 const Spacer(),
-                // Only show arrow if there are items
                 if (widget.items.isNotEmpty)
                   Icon(
                     _isExpanded
@@ -1232,7 +1463,6 @@ class _ExpandableMenuItemState extends State<ExpandableMenuItem> {
             ),
           ),
         ),
-        // Dropdown items
         if (widget.items.isNotEmpty)
           AnimatedCrossFade(
             firstChild: Container(height: 0),
@@ -1240,35 +1470,31 @@ class _ExpandableMenuItemState extends State<ExpandableMenuItem> {
               children: widget.items
                   .map(
                     (item) => Padding(
-                      padding: const EdgeInsets.only(
-                        left: 32,
-                        right: 16,
-                        top: 4,
-                        bottom: 4,
+                  padding: const EdgeInsets.only(
+                    left: 32,
+                    right: 16,
+                    top: 4,
+                    bottom: 4,
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      onPressed: () => _navigateToPage(context, item.page),
+                      style: TextButton.styleFrom(
+                        alignment: Alignment.centerLeft,
                       ),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: TextButton(
-                          onPressed: () => _navigateToPage(context, item.page),
-                          style: TextButton.styleFrom(
-                            alignment: Alignment.centerLeft,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 0,
-                              vertical: 8,
-                            ),
-                          ),
-                          child: Text(
-                            "• ${item.title}",
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black87,
-                            ),
-                            textAlign: TextAlign.left,
-                          ),
+                      child: Text(
+                        "${item.title}",
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black87,
                         ),
+                        textAlign: TextAlign.left,
                       ),
                     ),
-                  )
+                  ),
+                ),
+              )
                   .toList(),
             ),
             crossFadeState: _isExpanded

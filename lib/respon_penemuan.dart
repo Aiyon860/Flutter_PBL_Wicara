@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'custom_color.dart';
 
 // Impor layar konfirmasi penemuan
 
@@ -23,73 +24,70 @@ class ResponPenemuanScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: CustomColor.darkBlue,
       appBar: AppBar(
+        leading: const Icon(
+          Icons.arrow_back_rounded,
+          color: Colors.white,
+          size: 30,
+        ),
+        centerTitle: true,
         title: const Text(
-          'Kirim Bukti Penemuan',
+          'Konfirmasi Penemuan',
           style: TextStyle(
             color: Colors.white,
-            fontSize: 14,
-            fontFamily: 'Poppins',
-          ),
+            fontWeight: FontWeight.w400,
+          ), // Warna teks AppBar putih
         ),
-        backgroundColor: const Color(0xFF2879FE), // Warna AppBar
-        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: Colors.transparent, // Warna latar belakang AppBar
+        iconTheme: const IconThemeData(color: Colors.white), // Warna ikon AppBar putih
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.verified, color: Color(0xFF2879FE), size: 100), // Icon mirip dengan gambar di referensi
-            const SizedBox(height: 10),
+            const Icon(
+              Icons.check_circle,
+              color: Colors.white,
+              size: 200,
+            ),
+            const SizedBox(height: 20),
             const Text(
               'TERIMA KASIH',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
-                fontFamily: 'Poppins',
+                color: Colors.white,
               ),
-            ),
-            const SizedBox(height: 5), // Jarak 0.5 cm
-            const Text(
-              'Laporan Anda berhasil kami terima dan akan segera kami sampaikan kepada pemilik',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 10,
-                color: Color(0xFF858585),
-                fontFamily: 'Poppins',
-              ),
             ),
             const SizedBox(height: 10),
             const Text(
-              '* Data Informasi Anda telah kami Simpan dan akan kami bagikan kepada pemilik',
-              textAlign: TextAlign.center,
+              'Laporan Anda berhasil kami terima dan akan segera kami sampaikan kepada korban',
               style: TextStyle(
-                fontSize: 8,
-                color: Color(0xFFA5A5A5),
-                fontStyle: FontStyle.italic,
-                fontFamily: 'Poppins',
+                color: Colors.white,
               ),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 50),
             ElevatedButton(
               onPressed: () {
-                // Kembali ke halaman konfirmasi penemuan
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const MyApp()),
-                );
+                // Kembali ke dashboard
+                Navigator.pushNamed(context, '/dashboard_kehilangan');
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2879FE), // Warna background tombol
+                backgroundColor: CustomColor.goldColor, // Warna background tombol sama dengan AppBar
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50),
+                ),
               ),
               child: const Text(
-                'Kembali',
+                'Kembali ke Dashboard',
                 style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Poppins',
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold
                 ),
               ),
             ),

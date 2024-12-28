@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'custom_color.dart';
 import 'home.dart';
 
 void main() {
@@ -52,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     final url = Uri.parse(
-        'http://10.0.2.2/wicara/backend/api/mobile/simpan_login_app.php');
+        'http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/simpan_login_app.php');
 
     try {
       setState(() {
@@ -73,17 +74,22 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['status'] == 'success') {
-          String token = data['token']; // Ambil token dari respons
-          await saveToken(token); // Simpan token
-          //await checkToken(); 
+          if (data['token'] != null) {
+            String token = data['token']; // Ambil token dari respons
+            await saveToken(token); // Simpan token
+          }
 
           setState(() {
             _errorMessage = 'berhasil';
           });
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
-          );
+
+          if (data["user"]) {
+            Navigator.pushNamed(context, '/home');
+          } else if (data["super_admin"]) {
+            Navigator.pushNamed(context, '/home_super_admin');
+          } else {
+            Navigator.pushNamed(context, '/home_admin_instansi');
+          }
         } else {
           setState(() {
             _errorMessage =
@@ -118,164 +124,189 @@ class _LoginPageState extends State<LoginPage> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-        child: SingleChildScrollView(
-          child: Center(
-            child: Form(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height / 2.5,
-                    decoration: const BoxDecoration(
-                      color: CustomColor.primaryColor,
-                      borderRadius: BorderRadius.all(Radius.circular(15)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "images/login_pic.png",
-                          height: MediaQuery.of(context).size.height / 6,
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          "WICARA",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 30,
-                            fontWeight: FontWeight.w700
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        const Text(
-                          "Wadah Informasi Catatan\nAspirasi & Rating Akademik.",
-                          style: TextStyle(
-                            color: Colors.white
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    )
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(0, 40, 0, 40),
-                    child: Text(
-                      "Login",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 35,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 25),
-                    child: SizedBox(
-                      width: width / 3.25,
-                      child: TextFormField(
-                        controller: _usernameController,
-                        decoration: const InputDecoration(
-                          hintText: "Masukkan nomor induk anda",
-                          hintStyle:
-                              TextStyle(color: Color.fromARGB(100, 0, 0, 0)),
-                          prefixIcon: Icon(Icons.person),
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                    child: SizedBox(
-                      width: width / 3.25,
-                      child: TextFormField(
-                        controller: _passwordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          hintText: "Password",
-                          hintStyle:
-                              TextStyle(color: Color.fromARGB(100, 0, 0, 0)),
-                          prefixIcon: Icon(Icons.key),
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 25),
-                    child: SizedBox(
-                      width: width / 3.25,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Checkbox(
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(5)),
-                            ),
-                            value: value,
-                            onChanged: (bool? newValue) {
-                              setState(() {
-                                value = newValue;
-                              });
-                            },
-                          ),
-                          const Text("Ingat saya"),
-                        ],
-                      ),
-                    ),
-                  ),
-                  if (_errorMessage != null)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Text(
-                        _errorMessage!,
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                    ),
-                  SizedBox(
-                    width: width / 3.25,
-                    height: 50,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: CustomColor.primaryColor,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
-                      ),
-                      label: const Text(
-                        "Masuk",
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                      icon: const Icon(Icons.login, color: Colors.white),
-                      onPressed: login,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("images/abstract-blue-galaxy-with-stars.jpg"),
+            fit: BoxFit.cover,
           ),
         ),
-      ),
+        child: Stack(
+          children: [
+            // Black overlay for dimming effect
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.4), // Adjust opacity to control dimming
+              ),
+            ),
+            // Main content
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+              child: SingleChildScrollView(
+                child: Form(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height / 2.5,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "images/login_pic.png",
+                              height: MediaQuery.of(context).size.height / 6,
+                            ),
+                            const SizedBox(height: 20),
+                            const Text(
+                              "WICARA",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.w700),
+                            ),
+                            const SizedBox(height: 5),
+                            const Text(
+                              "Wadah Informasi Catatan\nAspirasi & Rating Akademik.",
+                              style: TextStyle(color: Colors.white),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height -
+                            (MediaQuery.of(context).size.height / 2.5),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.fromLTRB(0, 0, 0, 40),
+                                child: Text(
+                                  "Login",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 35,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 0, 0, 25),
+                                child: SizedBox(
+                                  width: width / 3.25,
+                                  child: TextFormField(
+                                    controller: _usernameController,
+                                    decoration: const InputDecoration(
+                                      hintText: "Masukkan nomor induk anda",
+                                      hintStyle: TextStyle(
+                                          color: Color.fromARGB(100, 0, 0, 0)),
+                                      prefixIcon: Icon(Icons.person),
+                                      border: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          width: 1.0,
+                                        ),
+                                        borderRadius:
+                                        BorderRadius.all(Radius.circular(15)),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                                child: SizedBox(
+                                  width: width / 3.25,
+                                  child: TextFormField(
+                                    controller: _passwordController,
+                                    obscureText: true,
+                                    decoration: const InputDecoration(
+                                      hintText: "Password",
+                                      hintStyle: TextStyle(
+                                          color: Color.fromARGB(100, 0, 0, 0)),
+                                      prefixIcon: Icon(Icons.key),
+                                      border: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          width: 1.0,
+                                        ),
+                                        borderRadius:
+                                        BorderRadius.all(Radius.circular(15)),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              if (_errorMessage != null)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  child: Text(
+                                    _errorMessage!,
+                                    style: const TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              const SizedBox(height: 40),
+                              SizedBox(
+                                width: width / 3.25,
+                                height: 50,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Color.fromRGBO(40, 121, 254, 1), // Custom blue
+                                        Color(0xFF00008B), // Dark blue
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(15),
+                                      onTap: login,
+                                      child: const Center(
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(Icons.login, color: Colors.white),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              "Masuk",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      )
     );
   }
 }
-
-class CustomColor {
-  static const primaryColor = Color(0xFF2879FE);
-}
-

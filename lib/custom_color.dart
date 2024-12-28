@@ -19,5 +19,7 @@ class CustomColor {
   static const selesaiColor = Color(0xFF14FF00);
   static const anotherGrey = Color(0xFFD9D9D9);
   static const sidebarFooterBgColor = Color(0xFF191919);
+  static const blackColor = Color(0xFF191919);
   static const borderGreyColor = Color(0xFFECECEC);
+  static const grayColor = Color(0xFFBFBFBF);
 }

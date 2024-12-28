@@ -4,9 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'custom_color.dart';
+import 'home.dart';
 import 'profile_page.dart';
 
 class EditProfileScreen extends StatefulWidget {
+  const EditProfileScreen({super.key});
+
   @override
   _EditProfileScreenState createState() => _EditProfileScreenState();
 }
@@ -33,7 +37,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _fetchProfileData() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    final url = Uri.parse('http://10.0.2.2/wicara/backend/api/mobile/tampil_profile_app.php');
+    final url = Uri.parse('http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/tampil_profile_app.php');
 
     try {
       final response = await http.post(url, body: {'token': token});
@@ -50,18 +54,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               profileData['jenis_kelamin'] == 'M' ? 'Laki-Laki' : 'Perempuan';
           _profileUrl = profileData['profile'] != null &&
                   profileData['profile'].isNotEmpty
-              ? 'http://10.0.2.2/wicara/backend/profile/${profileData["profile"]}'
+              ? 'http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/profile/${profileData["profile"]}'
               : null;
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal mengambil data profil.')),
+          const SnackBar(content: Text('Gagal mengambil data profil.')),
         );
       }
     } catch (e) {
       print('Error fetching profile data: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan saat mengambil data.')),
+        const SnackBar(content: Text('Terjadi kesalahan saat mengambil data.')),
       );
     }
   }
@@ -80,7 +84,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<bool> updateProfile() async {
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('token') ?? '';
-  final url = Uri.parse('http://10.0.2.2/wicara/backend/api/mobile/update_profile_app.php');
+  final url = Uri.parse('http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/update_profile_app.php');
 
   var request = http.MultipartRequest('POST', url);
   request.fields['token'] = token;
@@ -115,7 +119,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (data['status'] == 'success') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => ProfilePage()),
+          MaterialPageRoute(builder: (context) => const ProfilePage()),
         );
         return true;
       } else {
@@ -135,66 +139,87 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 40, 122, 254),
+        backgroundColor: CustomColor.darkBlue,
         iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
         title: const Text(
           'Edit Profile',
           style: TextStyle(color: Colors.white, fontSize: 16),
         ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            // Ganti dengan halaman yang ingin dituju
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                const ProfilePage(), // Ganti dengan widget halaman yang Anda inginkan
+              ),
+            );
+          },
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _buildProfileHeader(),
-            SizedBox(height: 30),
-            Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  children: [
-                    _buildForm(),
-                  ],
-                )),
-            const SizedBox(height: 30),
-            _buildActionButton(
-              'Simpan',
-              Colors.blue,
-              Colors.white,
-              () async {
-                bool success = await updateProfile();
-                if (success) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Profil berhasil diperbarui.')),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Gagal memperbarui profil.')),
-                  );
-                }
-              },
-              icon: Icons.save, // Tambahkan ikon jika diinginkan
-            ),
-            const SizedBox(height: 10),
-            _buildActionButton(
-                          'Batal',
-                          Colors.grey.shade300,
-                          Colors.black45,
-                          () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const ProfilePage()),
-                            );
-                          },
-                        ),
-          ],
-        ),
-        ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              _buildProfileHeader(),
+              const SizedBox(height: 30),
+              Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [BoxShadow(
+                      color: Colors.black.withOpacity(0.1), // Shadow color
+                      blurRadius: 6, // How much to blur the shadow
+                      offset: const Offset(0, 4), // Offset x and y
+                    )],
+                  ),
+                  child: Column(
+                    children: [
+                      _buildForm(),
+                    ],
+                  )),
+              const SizedBox(height: 30),
+              _buildActionButton(
+                'Simpan',
+                CustomColor.goldColor,
+                CustomColor.blackColor,
+                () async {
+                  bool success = await updateProfile();
+                  if (success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Profil berhasil diperbarui.')),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Gagal memperbarui profil.')),
+                    );
+                  }
+                },
+                icon: Icons.save, // Tambahkan ikon jika diinginkan
+              ),
+              const SizedBox(height: 10),
+              _buildActionButton(
+                            'Batal',
+                            Colors.grey.shade300,
+                            Colors.black45,
+                            () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const ProfilePage()),
+                              );
+                            },
+                            icon: Icons.close,
+                          ),
+            ],
+          ),
+          ),
+      ),
     );
   }
  
@@ -209,7 +234,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           image: AssetImage("assets/Background.png"),
           fit: BoxFit.cover,
           ),
-        borderRadius: const BorderRadius.all(Radius.circular(20)),
+        borderRadius: BorderRadius.all(Radius.circular(20)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -251,36 +276,36 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       children: [
         TextField(
           controller: _namaLengkapController,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Nama',
             border: OutlineInputBorder(),
           ),
         ),
-        SizedBox(height: 30),
+        const SizedBox(height: 30),
         TextField(
           controller: _phoneNumberController,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Nomor Telepon',
             border: OutlineInputBorder(),
           ),
         ),
-        SizedBox(height: 30),
+        const SizedBox(height: 30),
         TextField(
           controller: _emailController,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Email',
             border: OutlineInputBorder(),
           ),
         ),
-        SizedBox(height: 30),
+        const SizedBox(height: 30),
         TextField(
           controller: _bioController,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Bio',
             border: OutlineInputBorder(),
           ),
         ),
-        SizedBox(height: 30),
+        const SizedBox(height: 30),
         DropdownButtonFormField<String>(
           value: jenisKelamin,
           onChanged: (String? newValue) {
@@ -295,7 +320,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: Text(value),
             );
           }).toList(),
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Jenis Kelamin',
             border: OutlineInputBorder(),
           ),

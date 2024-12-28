@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobile_pbl/home.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'dart:convert';
@@ -17,36 +18,42 @@ void main() {
 }
 
 class AduanModel {
-  final String? nomor;
-  final String? status;
-  final String? judul;
-  final String? deskripsi;
-  final String? tanggalUpload;
-  final String? imagePath;
+  final String nomor;
+  final String status;
+  final String jenisAduan;
+  final String judul;
+  final String deskripsi;
+  final String tanggalUpload;
+  final String imagePath;
+  final bool imageExist;
 
   AduanModel({
-    this.nomor,
-    this.status,
-    this.judul,
-    this.deskripsi,
-    this.tanggalUpload,
-    this.imagePath,
+    required this.nomor,
+    required this.status,
+    required this.jenisAduan,
+    required this.judul,
+    required this.deskripsi,
+    required this.tanggalUpload,
+    required this.imagePath,
+    required this.imageExist,
   });
 
   factory AduanModel.fromJson(Map<String, dynamic> json) {
     return AduanModel(
-      nomor: json['nomor'] as String?,
-      status: json['status'] as String?,
-      judul: json['judul'] as String? ?? 'Tidak ada judul',
-      deskripsi: json['deskripsi'] as String? ?? 'Tidak ada deskripsi',
-      tanggalUpload: json['tanggalUpload'] as String?,
-      imagePath: json['imagePath'] as String?,
+      nomor: json['nomor'] as String,
+      status: json['status'] as String,
+      jenisAduan: json["jenisAduan"] as String,
+      judul: json['judul'] as String,
+      deskripsi: json['deskripsi'] as String,
+      tanggalUpload: json['tanggalUpload'] as String,
+      imagePath: json['imagePath'] as String,
+      imageExist: json['imageExist'] as bool,
     );
   }
 }
 
 class AduanPage extends StatefulWidget {
-  const AduanPage({Key? key}) : super(key: key);
+  const AduanPage({super.key});
 
   @override
   _AduanPageState createState() => _AduanPageState();
@@ -70,7 +77,7 @@ class _AduanPageState extends State<AduanPage> {
       // Menggunakan POST request untuk mengirim token
       final response = await http.post(
         Uri.parse(
-            'http://10.0.2.2/wicara/backend/api/mobile/ambil_pengaduan_app.php'),
+            'http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_pengaduan_app.php'),
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: {'token': token},
       ).timeout(const Duration(seconds: 5), onTimeout: () {
@@ -112,22 +119,6 @@ class _AduanPageState extends State<AduanPage> {
     }
   }
 
-//   Future<void> kirimToken() async {
-//   var url = Uri.parse('http://10.0.2.2/tailwindpbl/src/backend/get_pengaduan.php');
-
-//   SharedPreferences prefs = await SharedPreferences.getInstance();
-//   String? token = prefs.getString('token'); // Ambil token yang tersimpan
-
-//   final response = await http.post(
-//     url,
-//     headers: {"Content-Type": "application/x-www-form-urlencoded"},
-//     body: {'token': token ?? ''},
-//   );
-
-//   print("Response status: ${response.statusCode}");
-//   print("Response body: ${response.body}");
-// }
-
   @override
   void initState() {
     super.initState();
@@ -148,8 +139,8 @@ class _AduanPageState extends State<AduanPage> {
     String query = _searchController.text.toLowerCase();
     setState(() {
       _filteredAduan = _allAduan.where((aduan) {
-        return aduan.judul!.toLowerCase().contains(query) ||
-            aduan.deskripsi!.toLowerCase().contains(query);
+        return aduan.judul.toLowerCase().contains(query) ||
+            aduan.deskripsi.toLowerCase().contains(query);
       }).toList();
     });
   }
@@ -157,61 +148,77 @@ class _AduanPageState extends State<AduanPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: CustomColor.bgColorHome,
       appBar: AppBar(
         title: const Text('Aduan Saya',
             style: TextStyle(color: Colors.white, fontSize: 16.0)),
-        backgroundColor: CustomColor.primaryColor,
+        backgroundColor: CustomColor.darkBlue,
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.white),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
           },
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Ketikkan Nama Aduan',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
+      body: Column(
+        children: [
+          Container(
+            width: MediaQuery.of(context).size.width,
+            decoration: const BoxDecoration(
+              color: CustomColor.darkBlue,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(15),
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Cari Aduan',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: _filteredAduan.isEmpty
-                  ? const Center(child: Text('Tidak ada data tersedia.'))
-                  : ListView.builder(
-                      itemCount: _filteredAduan.length,
-                      itemBuilder: (context, index) {
-                        final aduan = _filteredAduan[index];
-                        return AduanCard(
-                          nomor: aduan.nomor ?? '',
-                          status: aduan.status ?? 'Status tidak diketahui',
-                          judul: aduan.judul ?? 'Tidak ada judul',
-                          deskripsi: aduan.deskripsi ?? 'Tidak ada deskripsi',
-                          tanggalUpload:
-                              aduan.tanggalUpload ?? 'Tanggal tidak tersedia',
-                          imagePath: aduan.imagePath,
-                        );
-                      },
-                    ),
-            ),
-            Container(
-              height: 10,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                color: Color.fromRGBO(0, 0, 0, 0),
-              )
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: _filteredAduan.isEmpty
+                ? const Center(child: Text('Tidak ada data tersedia.'))
+                : ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: _filteredAduan.length,
+                    itemBuilder: (context, index) {
+                      final aduan = _filteredAduan[index];
+                      return _buildPreviewAduanSaya(
+                          index + 1,
+                          aduan.judul,
+                          aduan.jenisAduan,
+                          aduan.tanggalUpload,
+                          aduan.status,
+                          aduan.imagePath,
+                          aduan.imageExist,
+                      );
+                    },
+                  ),
+          ),
+          Container(
+            height: 10,
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              color: Color.fromRGBO(0, 0, 0, 0),
             )
-          ],
-        ),
+          )
+        ],
       ),
     );
   }
@@ -223,6 +230,7 @@ class _AduanPageState extends State<AduanPage> {
     String tanggal,
     String status,
     String lampiran,
+      bool imageExist,
   ) {
     Color selectedColor;
 
@@ -247,21 +255,18 @@ class _AduanPageState extends State<AduanPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 10.0),
       width: double.infinity,
-      height: MediaQuery.of(context).size.height / 6,
       decoration: BoxDecoration(
           color: CustomColor.liatAduanSayaBgColor,
           borderRadius: const BorderRadius.all(Radius.circular(15)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 5,
-              blurRadius: 7.5,
-              offset: const Offset(0, 2),
-            )
-          ]),
+          boxShadow: [BoxShadow(
+            color: Colors.black.withOpacity(0.1), // Shadow color
+            blurRadius: 6, // How much to blur the shadow
+            offset: const Offset(0, 4), // Offset x and y
+          )],
+      ),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        child: Column(children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -289,9 +294,21 @@ class _AduanPageState extends State<AduanPage> {
           ),
           const SizedBox(height: 10),
           Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-            Image.asset(
-              "images/ac.png",
-              height: MediaQuery.of(context).size.height / 10,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10), // Set the border radius
+              child: imageExist
+                  ? Image.network(
+                "$lampiran",
+                height: MediaQuery.of(context).size.height / 15,
+                width: MediaQuery.of(context).size.width / 6.5,
+                fit: BoxFit.cover,
+              )
+                  : Image.asset(
+                "images/image_default.png",
+                height: MediaQuery.of(context).size.height / 15,
+                width: MediaQuery.of(context).size.width / 6.5,
+                fit: BoxFit.cover,
+              ),
             ),
             const SizedBox(width: 10),
             Column(
@@ -338,81 +355,5 @@ class _AduanPageState extends State<AduanPage> {
   String capitalizeFirstLetter(String word) {
     if (word.isEmpty) return word;
     return word[0].toUpperCase() + word.substring(1);
-  }
-}
-
-class AduanCard extends StatelessWidget {
-  final String nomor;
-  final String status;
-  final String judul;
-  final String deskripsi;
-  final String tanggalUpload;
-  final String? imagePath;
-
-  const AduanCard({
-    Key? key,
-    required this.nomor,
-    required this.status,
-    required this.judul,
-    required this.deskripsi,
-    required this.tanggalUpload,
-    this.imagePath,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      elevation: 5,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (imagePath != null && imagePath!.isNotEmpty)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.network(
-                  imagePath!,
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => const Icon(
-                    Icons.broken_image,
-                    color: Colors.grey,
-                    size: 60,
-                  ),
-                ),
-              ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(nomor,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16)),
-                      Text(status, style: const TextStyle(color: Colors.grey)),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(judul,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 18)),
-                  const SizedBox(height: 4),
-                  Text(deskripsi, style: const TextStyle(color: Colors.grey)),
-                  const SizedBox(height: 8),
-                  Text('Tanggal Upload $tanggalUpload',
-                      style: const TextStyle(color: Colors.grey, fontSize: 12)),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

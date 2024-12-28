@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import "custom_color.dart";
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_rating/flutter_rating.dart';
@@ -18,29 +19,91 @@ class FormRating extends StatelessWidget {
         useMaterial3: true,
         fontFamily: "Poppins",
       ),
-      home: const RatingScreen(),
+      home: const RatingScreenUser(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class RatingScreen extends StatefulWidget {
-  const RatingScreen({super.key});
+class RatingScreenUser extends StatefulWidget {
+  const RatingScreenUser({super.key});
 
   @override
-  RatingScreenState createState() => RatingScreenState();
+  RatingScreenUserState createState() => RatingScreenUserState();
 }
 
-class RatingScreenState extends State<RatingScreen> {
+class RatingScreenUserState extends State<RatingScreenUser> {
   bool? hideIdentity = false;
   double rating = 0;
   String imageName = '';
   File? _selectedImage;
   final TextEditingController _reviewController = TextEditingController();
+  String kodeInstansi = '';
+  String namaInstansi = '';
+  int idInstansi = 0;
+  String _errorMessage = '';
+  bool _isDataFetched = false;
 
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!_isDataFetched) {
+      final args = ModalRoute.of(context)?.settings.arguments as Map;
+      if (args != null) {
+        setState(() {
+          kodeInstansi = args["kode_instansi"];
+        });
+        fetchInstansiInfo();
+        _isDataFetched = true;
+      }
+    }
+  }
+
+  Future<void> fetchInstansiInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception('Token tidak ditemukan di SharedPreferences');
+    }
+
+    try {
+      Uri url = Uri.parse('http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_unit_layanan_untuk_rating_app.php');
+
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': "application/x-www-form-urlencoded"},
+        body: {
+          'token': token,
+          'kode_instansi': kodeInstansi,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['status'] == 'success') {
+          setState(() {
+            idInstansi = responseData["data"]["id_instansi"];
+            namaInstansi = responseData["data"]["nama_instansi"];
+          });
+        } else {
+          throw Exception('Failed to load data after response is sent');
+        }
+      } else {
+        throw Exception('Failed to load data before response is sent');
+      }
+    } catch (e) {
+      print(e);
+      setState(() {
+        _errorMessage = "Error fetching data: $e";
+      });
+    }
   }
 
   @override
@@ -56,7 +119,7 @@ class RatingScreenState extends State<RatingScreen> {
               padding: const EdgeInsets.all(14.0),
               child: Column(
                 children: [
-                  _buildHeader(),
+                  _buildHeader(namaInstansi),
                   const SizedBox(height: 20),
                   _buildFormContainer(),
                 ],
@@ -90,7 +153,7 @@ class RatingScreenState extends State<RatingScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(String namaInstansi) {
     return Padding(
       padding: const EdgeInsets.only(left: 10),
       child: Column(
@@ -101,12 +164,13 @@ class RatingScreenState extends State<RatingScreen> {
             style: TextStyle(fontSize: 12),
           ),
           const SizedBox(height: 10),
-          const Text(
-            "Rating Layanan\nUPA TIK",
+          Text(
+            "Rating Layanan\n$namaInstansi",
             style: TextStyle(
               fontSize: 30,
               fontWeight: FontWeight.bold,
             ),
+            softWrap: true,
           ),
           const SizedBox(height: 30),
           _buildSubheader(),
@@ -389,7 +453,7 @@ class RatingScreenState extends State<RatingScreen> {
     );
   }
 
-  void _submitRating() async {
+  Future<void> _submitRating() async {
     if (rating == 0 || _reviewController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Please provide both a rating and a review")));
@@ -460,10 +524,19 @@ class RatingScreenState extends State<RatingScreen> {
     required String review,
     String? filePath,
   }) async {
-    var url = Uri.parse('http://10.0.2.2/wicara/backend/api/mobile/simpan_ulasan_app.php');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception('Token tidak ditemukan di SharedPreferences');
+    }
+
+    var url = Uri.parse('http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/simpan_ulasan_app.php');
     var request = http.MultipartRequest('POST', url);
     
     // Setting fields as strings similar to the second code style
+    request.fields["token"] = token;
+    request.fields["idInstansi"] = idInstansi.toString();
     request.fields['hideIdentity'] = hideIdentity ? '1' : '0';
     request.fields['rating'] = rating.toInt().toString();
     request.fields['review'] = review;

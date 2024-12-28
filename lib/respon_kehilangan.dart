@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobile_pbl/dashboard_pengaduan.dart';
 import 'custom_color.dart';
 import 'home.dart';
 
@@ -18,13 +19,13 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: "Poppins",
       ),
-      home: const ResponAduan(),
+      home: const ResponKehilangan(),
     );
   }
 }
 
-class ResponAduan extends StatelessWidget {
-  const ResponAduan({super.key});
+class ResponKehilangan extends StatelessWidget {
+  const ResponKehilangan({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +67,7 @@ class ResponAduan extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               const Text(
-                'Aduan Anda berhasil dikirim',
+                'Laporan Anda berhasil dikirim',
                 style: TextStyle(
                   color: Colors.white,
                 ),
@@ -74,7 +75,7 @@ class ResponAduan extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               const Text(
-                'Kami akan memverifikasi Aduan Anda dalam waktu maksimal 3 hari. Terima kasih atas partisipasi Anda, harap menunggu konfirmasi lebih lanjut.',
+                'Kami akan memverifikasi laporan Anda da  lam waktu maksimal 3 hari. Terima kasih atas partisipasi Anda, harap menunggu konfirmasi lebih lanjut.',
                 style: TextStyle(
                   color: Colors.white,
                 ),
@@ -96,10 +97,10 @@ class ResponAduan extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    'Lihat Aduan Saya',
+                    'Lihat Laporan Kehilangan Saya',
                     style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),

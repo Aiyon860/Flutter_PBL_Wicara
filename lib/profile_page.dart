@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobile_pbl/notification_page.dart';
+import 'package:flutter_mobile_pbl/dashboard_kehilangan.dart';
+import 'package:flutter_mobile_pbl/dashboard_unit_layanan.dart';
+import 'package:flutter_mobile_pbl/dashboard_notifikasi.dart';
 import 'custom_color.dart' as cc;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'custom_color.dart';
 import 'edit_profile_screen.dart';
 import 'login.dart';
 import 'home.dart';
 import 'qr_scanner.dart';
-import 'buat_aduan.dart';
-import 'dashboard_pengaduan.dart';
+import 'form_aduan.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -27,57 +29,14 @@ class _ProfilePageState extends State<ProfilePage> {
   String nomorTelepon = '';
   String role = '';
   String email = '';
+  int notificationCount = 0;
   ImageProvider<Object> profile = const AssetImage('images/image_default.png');
-
-  int _selectedIndex = 0;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-
-    switch (_selectedIndex) {
-      case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
-        break;
-      case 1:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
-        _selectedIndex = 0;
-        break;
-      case 2:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const CreateAduanForm()),
-        );
-        _selectedIndex = 0;
-        break;
-      case 3:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const QRScannerScreen()),
-        );
-        _selectedIndex = 0;
-        break;
-      case 4:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
-        _selectedIndex = 0;
-        break;
-    }
-  }
 
   @override
   void initState() {
     super.initState();
     fetchProfileData();
+    fetchNotificationsCount();
   }
 
   Future<String> getToken() async {
@@ -87,7 +46,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<bool> removeToken() async {
     final token = await getToken();
-    final url = Uri.parse('http://10.0.2.2/wicara/backend/api/mobile/logout_app.php');
+    final url = Uri.parse('http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/logout_app.php');
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('token', '');
     bool status = false;
@@ -108,7 +67,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> fetchProfileData() async {
     final token = await getToken();
-    final url = Uri.parse('http://10.0.2.2/wicara/backend/api/mobile/tampil_profile_app.php');
+    final url = Uri.parse('http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/tampil_profile_app.php');
 
     try {
       final response = await http.post(
@@ -135,7 +94,7 @@ class _ProfilePageState extends State<ProfilePage> {
           role = dataProfile['nama_role'] ?? 'Role Tidak Ditemukan';
           bio = dataProfile['bio'] ?? 'Bio Tidak Ditemukan';
           profile = dataProfile['profile'] != null && dataProfile['profile'].isNotEmpty
-            ? NetworkImage('http://10.0.2.2/wicara/backend/profile/${dataProfile["profile"]}')
+            ? NetworkImage('http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/profile/${dataProfile["profile"]}')
             : const AssetImage('images/image_default.png');
 
         });
@@ -147,186 +106,275 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  Future<bool> fetchNotificationsCount() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token == null) {
+      throw Exception('Token tidak ditemukan di SharedPreferences');
+    }
+
+    Uri uri = Uri.parse(
+        "http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/jumlah_notifikasi_app.php");
+
+    final response = await http.post(
+      uri,
+      headers: {'Content-Type': "application/x-www-form-urlencoded"},
+      body: {'token': token },
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        notificationCount = json.decode(response.body)["data"];
+      });
+      return true;
+    } else {
+      print('Error: ${response.statusCode}');
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
-      drawer: _buildDrawer(),
+      backgroundColor: CustomColor.bgColorHome,
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 40, 122, 254),
+        backgroundColor: CustomColor.darkBlue,
         iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
         title: const Text(
-          'Akun',
+          'Your Profile',
           style: TextStyle(color: Colors.white, fontSize: 16),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.close, color: Colors.white),
+          onPressed: () {
+            // Ganti dengan halaman yang ingin dituju
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                const HomeScreen(), // Ganti dengan widget halaman yang Anda inginkan
+              ),
+            );
+          },
         ),
         actions: [
           Container(
             margin: const EdgeInsets.only(right: 16),
             decoration: BoxDecoration(
-              color: const Color(0xFF3A84FF),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: IconButton(
-              icon: const Icon(Icons.notifications,
-                  color: Colors.white, size: 24),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => NotificationsPage()),
-                );
-              },
+            child: SizedBox(
+              height: 30,
+              width: 30,
+              child: Stack(
+                children: [
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: const Icon(
+                      Icons.notifications,
+                      color: Color.fromARGB(255, 255, 255, 255),
+                      size: 25,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => NotifikasiScreen()),
+                      );
+                    },
+                  ),
+                  // Add the orange circle
+                  Positioned(
+                    top: 5,
+                    left: 5,
+                    child: Container(
+                      height: 10,
+                      width: 10,
+                      decoration: BoxDecoration(
+                        color: notificationCount > 0 ? Colors.redAccent : Colors.transparent,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
+      body: SizedBox(
+        height: MediaQuery.of(context).size.height,
+        child: Stack(
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height / 2.5,
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: CustomColor.darkBlue,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(40),
+                  bottomRight: Radius.circular(40),
                 ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: profile,
-                          fit: BoxFit.cover,
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    width: 90, // Adjust this for border thickness
+                    height: 90,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: CustomColor.goldColor, // Border color
+                        width: 2, // Thickness of the yellow border
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        width: 80, // Inner circle size
+                        height: 80,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            image: profile, // Replace 'profile' with your image provider
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    namaLengkap,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    textAlign: TextAlign.center,
+                    softWrap: true,
+                  ),
+                  const SizedBox(height: 2.5),
+                  Text(role,
+                      style: const TextStyle(
+                          fontSize: 14,
+                          color: CustomColor.grayColor
+                      )
+                  ),
+                  const SizedBox(height: 2.5),
+                  Text(nomorInduk,
+                      style: const TextStyle(
+                          fontSize: 14,
+                          color: CustomColor.grayColor
+                      )
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              top: MediaQuery.of(context).size.height / 3.5,
+              left: 0,
+              right: 0,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1), // Shadow color
+                            blurRadius: 6, // How much to blur the shadow
+                            offset: const Offset(0, 4), // Offset x and y
+                          ),
+                        ],
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            namaLengkap,
-                            style: const TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold),
+                          _buildProfileInfo('Bio', bio),
+                          _buildProfileInfo('Nama Lengkap', namaLengkap),
+                          _buildProfileInfo('Jenis Kelamin', jenisKelamin),
+                          _buildProfileInfo('Nomor Telepon', nomorTelepon),
+                          _buildProfileInfo('Alamat Akun', email),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: CustomColor.blackColor,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1), // Shadow color
+                            blurRadius: 6, // How much to blur the shadow
+                            offset: const Offset(0, 4), // Offset x and y
                           ),
-                          const SizedBox(height: 4),
-                          Text(role,
-                              style: const TextStyle(
-                                  fontSize: 14, color: Colors.grey)),
-                          Text(nomorInduk,
-                              style: const TextStyle(
-                                  fontSize: 14, color: Colors.grey)),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildActionButton(
+                            'Edit Profile',
+                                () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+                              ).then((value) {
+                                if (value != null && value) {
+                                  fetchProfileData(); // Ambil ulang data profil
+                                }
+                              });
+                            },
+                              true,
+                            icon: Icons.edit
+                          ),
+                          const SizedBox(
+                            height: 24,
+                            child: VerticalDivider(
+                              color: Colors.white, // Divider color
+                              thickness: 1,          // Divider thickness
+                              width: 20,             // Space between buttons
+                            ),
+                          ),
+                          _buildActionButton(
+                            'Log Out',
+                                () async {
+                              bool success = await removeToken();
+                              // Delay navigation slightly to allow the snackbar to be visible
+                              Future.delayed(const Duration(milliseconds: 100), () {
+                                if (mounted) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const LoginPage(title: '',)),
+                                  );
+                                }
+                              });
+                            },
+                            false,
+                            icon: Icons.logout,
+                          ),
                         ],
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 15),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildProfileInfo('Bio', bio),
-                    _buildProfileInfo('Nama Lengkap', namaLengkap),
-                    _buildProfileInfo('Jenis Kelamin', jenisKelamin),
-                    _buildProfileInfo('Nomor Telepon', nomorTelepon),
-                    _buildProfileInfo('Alamat Akun', email),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildActionButton(
-                          'Edit Profile',
-                          Colors.blue,
-                          Colors.white,
-                          () {
-                            Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => EditProfileScreen()),
-                          ).then((value) {
-                            if (value != null && value) {
-                              fetchProfileData(); // Ambil ulang data profil
-                            }
-                          });
-
-                          },
-                        ),
-                        _buildActionButton(
-                          'Log Out',
-                          Colors.grey.shade300,
-                          Colors.black45,
-                          () async {
-                            bool success = await removeToken();
-                            if (success) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Log out berhasil')),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Log out gagal')),
-                              );
-                            }
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginPage(title: '',)),
-                            );
-                          },
-                          icon: Icons.logout,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: cc.CustomColor.darkBlue,
-        unselectedItemColor: cc.CustomColor.liatAduanSayaFontColor,
-        selectedLabelStyle: const TextStyle(fontSize: 10),
-        unselectedLabelStyle: const TextStyle(fontSize: 10),
-        iconSize: 30,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.cast),
-            label: 'Jarkom',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.edit_square),
-            label: 'Buat Laporan',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.qr_code_scanner_outlined),
-            label: 'Scan Rating',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.trending_up),
-            label: 'Unit Layanan',
-          ),
-        ],
       ),
     );
   }
@@ -346,248 +394,19 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildActionButton(
-      String text, Color color, Color textColor, VoidCallback onPressed,
-      {IconData? icon}) {
+      String text, VoidCallback onPressed, bool isLeft, {IconData? icon}
+      ) {
     return ElevatedButton.icon(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: color,
+        backgroundColor: CustomColor.blackColor,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
       icon: icon != null
-          ? Icon(icon, color: textColor, size: 20)
+          ? Icon(icon, color: Colors.white, size: 20)
           : const SizedBox.shrink(),
-      label: Text(text, style: TextStyle(color: textColor, fontSize: 14)),
-    );
-  }
-
-  Widget _buildDrawer() {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.85,
-      child: Drawer(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Stack(
-                children: [
-                  _buildBodyDrawer(),
-                  _buildTopBarDrawer(),
-                  _buildFooterDrawer(),
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTopBarDrawer() {
-    return Positioned(
-      top: 0,
-      child: Container(
-          width: MediaQuery.of(context).size.width * 0.85,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            border: Border(
-              bottom: BorderSide(
-                color: cc.CustomColor.borderGreyColor,
-                width: 3.5,
-              ),
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Image.asset(
-                    "images/wicara_black.png",
-                    width: MediaQuery.of(context).size.width / 3,
-                    height: 25,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(
-                    Icons.close,
-                    color: cc.CustomColor.liatAduanSayaFontColor,
-                  ),
-                )
-              ],
-            ),
-          )),
-    );
-  }
-
-  Widget _buildBodyDrawer() {
-    return Container(
-      decoration: const BoxDecoration(color: cc.CustomColor.bgTransparentGrey),
-      height: MediaQuery.of(context).size.height,
-      width: MediaQuery.of(context).size.width,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(25, 85, 25, 25),
-        child: Column(
-          children: [
-            _buildProfPicBodyDrawer(profile),
-            const Divider(
-              color: cc.CustomColor.anotherGrey,
-              thickness: 1,
-              height: 50,
-            ),
-            ..._buildMenuBodyDrawer(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfPicBodyDrawer(ImageProvider<Object> profile) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          width: 75,
-          height: 75,
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(50)),
-            image: DecorationImage(
-              image: profile,
-              fit: BoxFit.cover,
-            ))),
-        const SizedBox(width: 25),
-        SizedBox(
-          width: MediaQuery.of(context).size.width / 2 - 6,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                namaLengkap,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-                maxLines: 3,
-                softWrap: true,
-                overflow: TextOverflow.fade,
-              ),
-              Text(role,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: cc.CustomColor.liatAduanSayaFontColor,
-                    fontWeight: FontWeight.w300,
-                  ),
-                  maxLines: 2,
-                  softWrap: true,
-                  overflow: TextOverflow.fade,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  List<Widget> _buildMenuBodyDrawer() {
-    return [
-      const ExpandableMenuItem(
-        title: 'Profile',
-        items: [], // Empty list for Profile since it has no sub-items
-      ),
-      ExpandableMenuItem(
-        title: 'Pengaduan',
-        items: [
-          MenuItemData(
-            title: 'Buat Aduan',
-            page: const CreateAduanForm(),
-          ),
-          MenuItemData(
-            title: 'Aduan Saya',
-            page: const AduanPage(),
-          ),
-        ],
-      ),
-      ExpandableMenuItem(
-        title: 'Kehilangan',
-        items: [
-          MenuItemData(
-            title: 'Buat Laporan',
-            page: const CreateAduanForm(), // TODO:placeholder
-          ),
-          MenuItemData(
-            title: 'Jarkom Kehilangan',
-            page: const CreateAduanForm(), // TODO:placeholder
-          ),
-        ],
-      ),
-    ];
-  }
-
-  Widget _buildFooterDrawer() {
-    return Positioned(
-      bottom: 0,
-      child: Container(
-          width: MediaQuery.of(context).size.width * 0.85,
-          decoration: const BoxDecoration(
-            color: cc.CustomColor.sidebarFooterBgColor,
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(15), topRight: Radius.circular(15)),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(25),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "HUBUNGI KAMI",
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Image.asset(
-                      "images/instagram.png",
-                      height: 25,
-                    ),
-                    const SizedBox(width: 10),
-                    Image.asset(
-                      "images/phone.png",
-                      height: 25,
-                    ),
-                    const SizedBox(width: 10),
-                    Image.asset(
-                      "images/mail.png",
-                      height: 25,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 45),
-                const Text(
-                  "Jl. Prof. Sudarto, Tembalang, Kec. Tembalang, Kota Semarang, Jawa Tengah 50275",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w300,
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 35),
-                Center(
-                  child: Text("Copyright @${DateTime.now().year} POLINES",
-                      style: const TextStyle(
-                        color: cc.CustomColor.goldColor,
-                        fontSize: 10,
-                      )),
-                ),
-              ],
-            ),
-          )),
+      label: Text(text, style: TextStyle(color: Colors.white, fontSize: 14)),
     );
   }
 }

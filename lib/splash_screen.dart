@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import "custom_color.dart";
 import "login.dart";
 import "custom_color.dart" as cc;
 
