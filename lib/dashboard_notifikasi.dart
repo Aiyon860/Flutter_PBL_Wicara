@@ -50,7 +50,7 @@ class _NotifikasiScreenState extends State<NotifikasiScreen> {
 
       final response = await http.post(
         Uri.parse(
-            'https://affe-2404-8000-1038-2bf7-2d22-5e29-a5aa-1532.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_notifikasi_all_app.php'),
+            'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_notifikasi_all_app.php'),
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: {'token': token},
       ).timeout(const Duration(seconds: 5), onTimeout: () {
@@ -336,7 +336,7 @@ class NotificationTile extends StatelessWidget {
       String? token = prefs.getString('token');
 
       final response = await http.post(
-        Uri.parse("https://affe-2404-8000-1038-2bf7-2d22-5e29-a5aa-1532.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/update_flag_notifikasi_app.php"),
+        Uri.parse("https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/update_flag_notifikasi_app.php"),
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: {
           'token': token,

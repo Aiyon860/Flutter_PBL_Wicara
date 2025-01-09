@@ -66,7 +66,7 @@ class _DetailNotificationScreenState extends State<DetailNotificationScreen> {
 
       final response = await http.post(
         Uri.parse(
-            'https://affe-2404-8000-1038-2bf7-2d22-5e29-a5aa-1532.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/detail_notifikasi_app.php'),
+            'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/detail_notifikasi_app.php'),
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: {
           'token': token,
@@ -165,37 +165,7 @@ class _DetailNotificationScreenState extends State<DetailNotificationScreen> {
                           fontWeight: FontWeight.w400,
                         )
                       ),
-                      if (true) ...[
-                        const SizedBox(height: 40.0),
-                        ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              backgroundColor: const Color(0xFFFFB903),
-                            ),
-                            onPressed: () {
-                              // TODO: FUCKKKKKKKKKKKKKKKKKK
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                    Icons.launch,
-                                    color: Colors.black
-                                ),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Lihat Laporan $jenisKejadian Saya',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            )
-                          )
-                        ]
+                      const SizedBox(height: 30.0),
                     ],
                   ),
                 ),

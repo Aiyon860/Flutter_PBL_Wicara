@@ -37,7 +37,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _fetchProfileData() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    final url = Uri.parse('http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/tampil_profile_app.php');
+    final url = Uri.parse('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/tampil_profile_app.php');
 
     try {
       final response = await http.post(url, body: {'token': token});
@@ -54,7 +54,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               profileData['jenis_kelamin'] == 'M' ? 'Laki-Laki' : 'Perempuan';
           _profileUrl = profileData['profile'] != null &&
                   profileData['profile'].isNotEmpty
-              ? 'http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/profile/${profileData["profile"]}'
+              ? 'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/profile/${profileData["profile"]}'
               : null;
         });
       } else {
@@ -84,7 +84,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<bool> updateProfile() async {
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('token') ?? '';
-  final url = Uri.parse('http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/update_profile_app.php');
+  final url = Uri.parse('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/update_profile_app.php');
 
   var request = http.MultipartRequest('POST', url);
   request.fields['token'] = token;

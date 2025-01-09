@@ -54,7 +54,7 @@ class QRScannerScreenState extends State<QRScannerScreen>
   }
 
   Future<void> verifyQR(String scannedQR) async {
-    final url = Uri.parse('https://affe-2404-8000-1038-2bf7-2d22-5e29-a5aa-1532.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/check_qr_app.php'); // Pastikan alamat server sesuai
+    final url = Uri.parse('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/check_qr_app.php'); // Pastikan alamat server sesuai
 
     try {
       final response = await http.post(

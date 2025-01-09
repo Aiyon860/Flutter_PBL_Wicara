@@ -74,7 +74,7 @@ class RatingScreenUserState extends State<RatingScreenUser> {
     }
 
     try {
-      Uri url = Uri.parse('http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_unit_layanan_untuk_rating_app.php');
+      Uri url = Uri.parse('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_unit_layanan_untuk_rating_app.php');
 
       final response = await http.post(
         url,
@@ -531,7 +531,7 @@ class RatingScreenUserState extends State<RatingScreenUser> {
       throw Exception('Token tidak ditemukan di SharedPreferences');
     }
 
-    var url = Uri.parse('http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/simpan_ulasan_app.php');
+    var url = Uri.parse('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/simpan_ulasan_app.php');
     var request = http.MultipartRequest('POST', url);
     
     // Setting fields as strings similar to the second code style

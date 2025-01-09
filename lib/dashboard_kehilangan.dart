@@ -104,10 +104,10 @@ class _LostItemsScreenState extends State<LostItemsScreen> with SingleTickerProv
   String _errorMessage = '';
   int _selectedTabIndex = 0;
   final List<String> _endpoints = [
-    'http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/get_belum_ditemukan_app.php',
-    'http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/get_ditemukan_app.php',
-    'http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/get_temuan_app.php',
-    'http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/get_riwayat_saya_app.php',
+    'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/get_belum_ditemukan_app.php',
+    'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/get_ditemukan_app.php',
+    'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/get_temuan_app.php',
+    'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/get_riwayat_saya_app.php',
   ];
   int visibleCount = 0;
 

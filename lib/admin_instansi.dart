@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 // variabel api url
 // const String baseUrl = 'https://6535-66-96-225-128.ngrok-free.app/Wicara_Admin_Web';
-const String baseUrl = 'https://affe-2404-8000-1038-2bf7-2d22-5e29-a5aa-1532.ngrok-free.app/WICARA_FIX/Wicara_Admin_Web';
+const String baseUrl = 'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_Admin_Web';
 final loginUrl = Uri.parse('$baseUrl/api/api_login_instansi.php');
 final berandaUrl = Uri.parse('$baseUrl/api/api_beranda.php');
 final pengaduanUrl = Uri.parse('$baseUrl/api/api_pengaduan.php');

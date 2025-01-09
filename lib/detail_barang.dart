@@ -36,7 +36,7 @@ class DetailBarangPage extends StatelessWidget {
       String? token = prefs.getString('token');
 
       final response = await http.post(
-        Uri.parse("https://affe-2404-8000-1038-2bf7-2d22-5e29-a5aa-1532.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ganti_status_kehilangan_app.php"),
+        Uri.parse("https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ganti_status_kehilangan_app.php"),
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: {
           'token': token,

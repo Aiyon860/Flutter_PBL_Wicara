@@ -67,7 +67,7 @@ class _UploadPenemuanState extends State<UploadPenemuan> {
       throw Exception('Token tidak ditemukan di SharedPreferences');
     }
 
-    final uri = Uri.parse('https://affe-2404-8000-1038-2bf7-2d22-5e29-a5aa-1532.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/simpan_penemuan_app.php');
+    final uri = Uri.parse('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/simpan_penemuan_app.php');
     final request = http.MultipartRequest('POST', uri);
 
     request.fields['token'] = token;

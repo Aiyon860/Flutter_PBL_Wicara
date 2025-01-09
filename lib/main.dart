@@ -37,9 +37,6 @@ class MyApp extends StatelessWidget {
         '/profile': (context) => const ProfilePage(),
         '/notification_detail': (context) => const DetailNotificationScreen(),
         '/dashboard_kehilangan': (context) => const LostItemsScreen(),
-        // '/aduan_detail': (context) => const DetailNotificationScreen(),
-        // '/kehilangan_detail': (context) => const DetailNotificationScreen(),
-        // '/temuan_detail': (context) => const DetailNotificationScreen(),
         '/form_penemuan': (context) => const UploadPenemuan(),
       },
     );

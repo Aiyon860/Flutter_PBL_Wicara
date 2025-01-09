@@ -117,7 +117,7 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
     }
 
     Uri uri = Uri.parse(
-        "http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/tampil_jenis_pengaduan_form_aduan_app.php");
+        "https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/tampil_jenis_pengaduan_form_aduan_app.php");
 
     final response = await http.post(
       uri,
@@ -147,7 +147,7 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
     }
 
     Uri uri = Uri.parse(
-        "http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/tampil_instansi_form_aduan_app.php");
+        "https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/tampil_instansi_form_aduan_app.php");
 
     final response = await http.post(
       uri,
@@ -602,7 +602,7 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
 }
 
 Future<bool> kirimLaporan(Laporan laporan) async {
-  var url = Uri.parse('http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/simpan_aduan_app.php');
+  var url = Uri.parse('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/simpan_aduan_app.php');
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? token = prefs.getString('token'); // Ambil token yang tersimpan

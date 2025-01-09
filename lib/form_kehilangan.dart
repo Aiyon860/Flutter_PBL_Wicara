@@ -478,7 +478,7 @@ class _CreateKehilanganFormState extends State<CreateKehilanganForm> {
 
 Future<bool> kirimLaporanKehilangan(Laporan laporan) async {
   var url = Uri.parse(
-      'https://affe-2404-8000-1038-2bf7-2d22-5e29-a5aa-1532.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/simpan_kehilangan_app.php');
+      'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/simpan_kehilangan_app.php');
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? token = prefs.getString('token'); // Ambil token yang tersimpan

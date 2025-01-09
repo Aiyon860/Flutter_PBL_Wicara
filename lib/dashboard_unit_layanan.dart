@@ -103,7 +103,7 @@ class DashboardUnitLayananPageState extends State<DashboardUnitLayananPage> {
 
     final response = await http.post(
       Uri.parse(
-          'http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_unit_layanan_app.php'),
+          'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_unit_layanan_app.php'),
       headers: {"Content-Type": "application/x-www-form-urlencoded"},
       body: {'token': token},
     ).timeout(const Duration(seconds: 5), onTimeout: () {
@@ -249,7 +249,7 @@ class DashboardUnitLayananPageState extends State<DashboardUnitLayananPage> {
                         topRight: Radius.circular(15),
                       ),
                       child: Image.network(
-                        "http://10.0.2.2/WICARA_FIX/Wicara_User_Web/assets/images/instansi/$lampiran",
+                        "https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/assets/images/instansi/$lampiran",
                         width: double.infinity,
                         height: MediaQuery.of(context).size.height / 4,
                         fit: BoxFit.cover,

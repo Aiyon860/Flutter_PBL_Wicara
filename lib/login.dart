@@ -53,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     final url = Uri.parse(
-        'http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/simpan_login_app.php');
+        'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/simpan_login_app.php');
 
     try {
       setState(() {

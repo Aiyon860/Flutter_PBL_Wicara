@@ -481,7 +481,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     Uri uri = Uri.parse(
-        "http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_unit_layanan_home_app.php");
+        "https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_unit_layanan_home_app.php");
 
     final response = await http.post(
       uri,
@@ -509,7 +509,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     Uri uri = Uri.parse(
-        "http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/jumlah_notifikasi_app.php");
+        "https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/jumlah_notifikasi_app.php");
 
     final response = await http.post(
       uri,
@@ -573,7 +573,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         topRight: Radius.circular(15),
                       ),
                       child: Image.network(
-                        "http://10.0.2.2/WICARA_FIX/Wicara_User_Web/assets/images/instansi/$lampiran",
+                        "https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/assets/images/instansi/$lampiran",
                         width: double.infinity,
                         height: MediaQuery.of(context).size.height / 4,
                         fit: BoxFit.cover,
@@ -825,7 +825,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     Uri uri = Uri.parse(
-        "http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_aduan_terbaru_app.php");
+        "https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_aduan_terbaru_app.php");
 
     final response = await http.post(
       uri,
@@ -932,7 +932,7 @@ class _HomeScreenState extends State<HomeScreen> {
               borderRadius: BorderRadius.circular(10), // Set the border radius
               child: imageExist
                   ? Image.network(
-                    "http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/aduan/$lampiran",
+                    "https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/aduan/$lampiran",
                     height: MediaQuery.of(context).size.height / 15,
                     width: MediaQuery.of(context).size.width / 6.5,
                     fit: BoxFit.cover,
@@ -1055,7 +1055,7 @@ class _HomeScreenState extends State<HomeScreen> {
       throw Exception('Token tidak ditemukan di SharedPreferences');
     }
 
-    Uri url = Uri.parse("http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_user_home_app.php");
+    Uri url = Uri.parse("https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_user_home_app.php");
     final response = await http.post(
       url,
       headers: {'Content-Type': "application/x-www-form-urlencoded"},
@@ -1070,7 +1070,7 @@ class _HomeScreenState extends State<HomeScreen> {
       user["nama"] = dataProfile["nama"] ?? "Nama tidak ada";
       user["role"] = dataProfile["nama_role"] ?? "Role tidak ditemukan";
       user["profile"] = dataProfile["profile"] != null && dataProfile["profile"].isNotEmpty 
-        ? NetworkImage('http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/profile/${dataProfile["profile"]}')
+        ? NetworkImage('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/profile/${dataProfile["profile"]}')
         : const AssetImage('images/image_default.png');
 
       setState(() {

@@ -46,7 +46,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<bool> removeToken() async {
     final token = await getToken();
-    final url = Uri.parse('http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/logout_app.php');
+    final url = Uri.parse('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/logout_app.php');
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('token', '');
     bool status = false;
@@ -67,7 +67,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> fetchProfileData() async {
     final token = await getToken();
-    final url = Uri.parse('http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/tampil_profile_app.php');
+    final url = Uri.parse('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/tampil_profile_app.php');
 
     try {
       final response = await http.post(
@@ -94,7 +94,7 @@ class _ProfilePageState extends State<ProfilePage> {
           role = dataProfile['nama_role'] ?? 'Role Tidak Ditemukan';
           bio = dataProfile['bio'] ?? 'Bio Tidak Ditemukan';
           profile = dataProfile['profile'] != null && dataProfile['profile'].isNotEmpty
-            ? NetworkImage('http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/profile/${dataProfile["profile"]}')
+            ? NetworkImage('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/profile/${dataProfile["profile"]}')
             : const AssetImage('images/image_default.png');
 
         });
@@ -115,7 +115,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     Uri uri = Uri.parse(
-        "http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/jumlah_notifikasi_app.php");
+        "https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/jumlah_notifikasi_app.php");
 
     final response = await http.post(
       uri,

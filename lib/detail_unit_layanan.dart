@@ -56,7 +56,7 @@ class _UnitLayananScreenState extends State<UnitLayananScreen> {
   Future<void> fetchData() async {
     try {
       final url = Uri.parse(
-          'http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_detail_unit_layanan_app.php?id_instansi=${widget.idInstansi}');
+          'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_detail_unit_layanan_app.php?id_instansi=${widget.idInstansi}');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -136,7 +136,7 @@ class _UnitLayananScreenState extends State<UnitLayananScreen> {
               ? ClipRRect(
                 borderRadius: BorderRadius.circular(15),
                 child: Image.network(
-                        'http://10.0.2.2/WICARA_FIX/Wicara_User_Web/assets/images/instansi/${instansi['gambar_instansi']}',
+                        'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/assets/images/instansi/${instansi['gambar_instansi']}',
                         height: MediaQuery.of(context).size.height / 3,
                         width: double.infinity,
                         fit: BoxFit.cover,
@@ -245,7 +245,7 @@ class _UnitLayananScreenState extends State<UnitLayananScreen> {
                           String relativeTime = _timeAgo(ulasan['tanggal'] ?? '');
 
                           final profileName = ulasan['profile'] ?? ''; // Ambil nama file dari database
-                          final profileUrl = 'http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/profile/$profileName';
+                          final profileUrl = 'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/profile/$profileName';
 
                           return Container(
                             margin: const EdgeInsets.only(bottom: 8),

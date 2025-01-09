@@ -77,7 +77,7 @@ class _AduanPageState extends State<AduanPage> {
       // Menggunakan POST request untuk mengirim token
       final response = await http.post(
         Uri.parse(
-            'http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_pengaduan_app.php'),
+            'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_pengaduan_app.php'),
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: {'token': token},
       ).timeout(const Duration(seconds: 5), onTimeout: () {
