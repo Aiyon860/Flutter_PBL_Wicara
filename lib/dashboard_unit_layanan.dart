@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'api.dart';
 import 'custom_color.dart';
 import 'detail_unit_layanan.dart';
+import 'images_default.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -102,8 +104,7 @@ class DashboardUnitLayananPageState extends State<DashboardUnitLayananPage> {
     }
 
     final response = await http.post(
-      Uri.parse(
-          'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_unit_layanan_app.php'),
+      Uri.parse(ApiWicara.fetchDataUnitLayananDashboardUrl),
       headers: {"Content-Type": "application/x-www-form-urlencoded"},
       body: {'token': token},
     ).timeout(const Duration(seconds: 5), onTimeout: () {
@@ -249,13 +250,13 @@ class DashboardUnitLayananPageState extends State<DashboardUnitLayananPage> {
                         topRight: Radius.circular(15),
                       ),
                       child: Image.network(
-                        "https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/assets/images/instansi/$lampiran",
+                        lampiran,
                         width: double.infinity,
                         height: MediaQuery.of(context).size.height / 4,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Image.asset(
-                            "images/default_unit_layanan_pic.png",
+                            DefaultImage.detailUnitLayananPath,
                             width: double.infinity,
                             height: MediaQuery.of(context).size.height / 4,
                             fit: BoxFit.cover,

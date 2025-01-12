@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobile_pbl/dashboard_kehilangan.dart';
-import 'package:flutter_mobile_pbl/dashboard_unit_layanan.dart';
 import 'package:flutter_mobile_pbl/dashboard_notifikasi.dart';
-import 'custom_color.dart' as cc;
+import 'api.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,8 +8,6 @@ import 'custom_color.dart';
 import 'edit_profile_screen.dart';
 import 'login.dart';
 import 'home.dart';
-import 'qr_scanner.dart';
-import 'form_aduan.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -30,7 +26,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String role = '';
   String email = '';
   int notificationCount = 0;
-  ImageProvider<Object> profile = const AssetImage('images/image_default.png');
+  ImageProvider<Object> profile = const AssetImage('images/aduan_kehilangan_picture_default.png');
 
   @override
   void initState() {
@@ -46,7 +42,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<bool> removeToken() async {
     final token = await getToken();
-    final url = Uri.parse('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/logout_app.php');
+    final url = Uri.parse(ApiWicara.removeTokenUrl);
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('token', '');
     bool status = false;
@@ -67,7 +63,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> fetchProfileData() async {
     final token = await getToken();
-    final url = Uri.parse('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/tampil_profile_app.php');
+    final url = Uri.parse(ApiWicara.fetchProfileDataUrl);
 
     try {
       final response = await http.post(
@@ -93,10 +89,9 @@ class _ProfilePageState extends State<ProfilePage> {
           email = dataProfile['email'] ?? 'Email Tidak Ditemukan';
           role = dataProfile['nama_role'] ?? 'Role Tidak Ditemukan';
           bio = dataProfile['bio'] ?? 'Bio Tidak Ditemukan';
-          profile = dataProfile['profile'] != null && dataProfile['profile'].isNotEmpty
-            ? NetworkImage('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/profile/${dataProfile["profile"]}')
-            : const AssetImage('images/image_default.png');
-
+          profile = dataProfile['image_exist']
+            ? NetworkImage(dataProfile['lampiran'])
+            : profile;
         });
       } else {
         throw Exception('Failed to load profile data');
@@ -114,8 +109,7 @@ class _ProfilePageState extends State<ProfilePage> {
       throw Exception('Token tidak ditemukan di SharedPreferences');
     }
 
-    Uri uri = Uri.parse(
-        "https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/jumlah_notifikasi_app.php");
+    Uri uri = Uri.parse(ApiWicara.fetchNotificationCountUrl);
 
     final response = await http.post(
       uri,
@@ -124,8 +118,9 @@ class _ProfilePageState extends State<ProfilePage> {
     );
 
     if (response.statusCode == 200) {
+      int count = json.decode(response.body)["data"];
       setState(() {
-        notificationCount = json.decode(response.body)["data"];
+        notificationCount = count;
       });
       return true;
     } else {
@@ -257,14 +252,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     softWrap: true,
                   ),
                   const SizedBox(height: 2.5),
-                  Text(role,
-                      style: const TextStyle(
-                          fontSize: 14,
-                          color: CustomColor.grayColor
-                      )
-                  ),
-                  const SizedBox(height: 2.5),
-                  Text(nomorInduk,
+                  Text('$role | $nomorInduk',
                       style: const TextStyle(
                           fontSize: 14,
                           color: CustomColor.grayColor

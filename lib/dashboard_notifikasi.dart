@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobile_pbl/home.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'api.dart';
 import 'custom_color.dart';
 
 void main() {
@@ -49,8 +50,7 @@ class _NotifikasiScreenState extends State<NotifikasiScreen> {
       }
 
       final response = await http.post(
-        Uri.parse(
-            'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_notifikasi_all_app.php'),
+        Uri.parse(ApiWicara.fetchNotificationAllUrl),
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: {'token': token},
       ).timeout(const Duration(seconds: 5), onTimeout: () {
@@ -336,7 +336,7 @@ class NotificationTile extends StatelessWidget {
       String? token = prefs.getString('token');
 
       final response = await http.post(
-        Uri.parse("https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/update_flag_notifikasi_app.php"),
+        Uri.parse(ApiWicara.updateNotificationFlagUrl),
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: {
           'token': token,
@@ -418,7 +418,7 @@ class NotificationTile extends StatelessWidget {
                       fit: BoxFit.cover,
                     )
                         : Image.asset(
-                      "images/image_default.png",
+                      "images/aduan_kehilangan_picture_default.png",
                       height: MediaQuery.of(context).size.height / 10,
                       width: MediaQuery.of(context).size.width / 6.5,
                       fit: BoxFit.cover,

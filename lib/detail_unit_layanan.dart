@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'api.dart';
 import 'custom_color.dart';
+import 'images_default.dart';
 
 void main() {
   runApp(const MyApp());
@@ -53,10 +55,9 @@ class _UnitLayananScreenState extends State<UnitLayananScreen> {
   }
 
   // Fungsi untuk mengambil data dari API
-  Future<void> fetchData() async {
+  Future<void> fetchDetailUnitLayanan() async {
     try {
-      final url = Uri.parse(
-          'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_detail_unit_layanan_app.php?id_instansi=${widget.idInstansi}');
+      final url = Uri.parse(ApiWicara.fetchDetailUnitLayananUrl + widget.idInstansi);
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
@@ -74,7 +75,7 @@ class _UnitLayananScreenState extends State<UnitLayananScreen> {
   @override
   void initState() {
     super.initState();
-    fetchData();
+    fetchDetailUnitLayanan();
   }
 
   @override
@@ -136,7 +137,7 @@ class _UnitLayananScreenState extends State<UnitLayananScreen> {
               ? ClipRRect(
                 borderRadius: BorderRadius.circular(15),
                 child: Image.network(
-                        'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/assets/images/instansi/${instansi['gambar_instansi']}',
+                        instansi['gambar_instansi'],
                         height: MediaQuery.of(context).size.height / 3,
                         width: double.infinity,
                         fit: BoxFit.cover,
@@ -153,7 +154,7 @@ class _UnitLayananScreenState extends State<UnitLayananScreen> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
                   child: Image.asset(
-                      "images/default_unit_layanan_pic.png",
+                      DefaultImage.detailUnitLayananPath,
                       width: double.infinity,
                       height: MediaQuery.of(context).size.height / 4,
                       fit: BoxFit.cover,
@@ -245,7 +246,7 @@ class _UnitLayananScreenState extends State<UnitLayananScreen> {
                           String relativeTime = _timeAgo(ulasan['tanggal'] ?? '');
 
                           final profileName = ulasan['profile'] ?? ''; // Ambil nama file dari database
-                          final profileUrl = 'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/profile/$profileName';
+                          final profilePictureUrl = ApiWicara.fetchProfilePictureUrl + profileName;
 
                           return Container(
                             margin: const EdgeInsets.only(bottom: 8),
@@ -273,7 +274,7 @@ class _UnitLayananScreenState extends State<UnitLayananScreen> {
                                     children: [
                                       ClipOval(
                                         child: Image.network(
-                                          profileUrl,
+                                          profilePictureUrl,
                                           width: 40,
                                           height: 40,
                                           fit: BoxFit.cover,

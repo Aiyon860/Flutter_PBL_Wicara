@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'api.dart';
 import 'custom_color.dart';
 import 'detail_barang.dart';
 import 'detail_penemuan.dart';
@@ -104,10 +105,10 @@ class _LostItemsScreenState extends State<LostItemsScreen> with SingleTickerProv
   String _errorMessage = '';
   int _selectedTabIndex = 0;
   final List<String> _endpoints = [
-    'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/get_belum_ditemukan_app.php',
-    'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/get_ditemukan_app.php',
-    'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/get_temuan_app.php',
-    'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/get_riwayat_saya_app.php',
+    ApiWicara.fetchKehilanganBelumDitemukanUrl,
+    ApiWicara.fetchKehilanganSudahDitemukanUrl,
+    ApiWicara.fetchTemuanUrl,
+    ApiWicara.fetchRiwayatKehilanganUserUrl,
   ];
   int visibleCount = 0;
 
@@ -516,7 +517,7 @@ class LostItemCard extends StatelessWidget {
                     fit: BoxFit.cover,
                   )
                       : Image.asset(
-                    "images/image_default.png",
+                    "images/aduan_kehilangan_picture_default.png",
                     height: MediaQuery.of(context).size.height / 15,
                     width: MediaQuery.of(context).size.width / 6.5,
                     fit: BoxFit.cover,

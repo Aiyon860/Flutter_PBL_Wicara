@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'api.dart';
 import 'custom_color.dart';
 import 'form_rating.dart';
 
@@ -54,7 +55,7 @@ class QRScannerScreenState extends State<QRScannerScreen>
   }
 
   Future<void> verifyQR(String scannedQR) async {
-    final url = Uri.parse('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/check_qr_app.php'); // Pastikan alamat server sesuai
+    final url = Uri.parse(ApiWicara.verifyQrUrl); // Pastikan alamat server sesuai
 
     try {
       final response = await http.post(
@@ -64,6 +65,7 @@ class QRScannerScreenState extends State<QRScannerScreen>
       );
 
       if (response.statusCode == 200) {
+        print(scannedQR);
         final data = json.decode(response.body);
         if (data['status'] == 'success') {
           // QR cocok, pindah ke halaman rating menggunakan deep linking
@@ -75,7 +77,7 @@ class QRScannerScreenState extends State<QRScannerScreen>
         } else {
           // QR tidak cocok, tampilkan pesan
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Kode QR tidak valid!')),
+            SnackBar(content: Text('Kode QR tidak valid! $scannedQR')),
           );
         }
       } else {

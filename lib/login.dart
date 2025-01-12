@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'api.dart';
 import 'custom_color.dart';
-import 'home.dart';
 
 void main() {
   runApp(const MyApp());
@@ -52,8 +52,7 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    final url = Uri.parse(
-        'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/simpan_login_app.php');
+    final url = Uri.parse(ApiWicara.loginUrl);
 
     try {
       setState(() {

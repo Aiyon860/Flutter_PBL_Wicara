@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'api.dart';
 import 'custom_color.dart';
 
 class DetailBarangPage extends StatelessWidget {
@@ -36,7 +37,7 @@ class DetailBarangPage extends StatelessWidget {
       String? token = prefs.getString('token');
 
       final response = await http.post(
-        Uri.parse("https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ganti_status_kehilangan_app.php"),
+        Uri.parse(ApiWicara.changeKehilanganStatusUrl),
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: {
           'token': token,

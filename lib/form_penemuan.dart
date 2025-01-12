@@ -6,6 +6,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'api.dart';
 import 'custom_color.dart';
 import 'respon_penemuan.dart';
 
@@ -59,7 +60,7 @@ class _UploadPenemuanState extends State<UploadPenemuan> {
 
   final ImagePicker _picker = ImagePicker();
 
-  Future<void> _submitForm() async {
+  Future<void> submitPenemuan() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
@@ -67,7 +68,7 @@ class _UploadPenemuanState extends State<UploadPenemuan> {
       throw Exception('Token tidak ditemukan di SharedPreferences');
     }
 
-    final uri = Uri.parse('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/simpan_penemuan_app.php');
+    final uri = Uri.parse(ApiWicara.submitPenemuanUrl);
     final request = http.MultipartRequest('POST', uri);
 
     request.fields['token'] = token;
@@ -150,7 +151,7 @@ class _UploadPenemuanState extends State<UploadPenemuan> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _submitForm,
+                onPressed: submitPenemuan,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: CustomColor.goldColor,
                   padding: const EdgeInsets.symmetric(vertical: 16),

@@ -100,7 +100,7 @@ class _TopBarState extends State<TopBar> {
                   decoration: const BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(5)),
                       image: DecorationImage(
-                        image: AssetImage("images/prof_pic.png"),
+                        image: AssetImage("images/prof_picture_default.png"),
                         fit: BoxFit.cover,
                       )))
             ],

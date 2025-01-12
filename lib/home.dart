@@ -5,11 +5,13 @@ import 'package:flutter_mobile_pbl/dashboard_kehilangan.dart';
 import 'package:flutter_mobile_pbl/form_kehilangan.dart';
 import 'package:flutter_mobile_pbl/dashboard_notifikasi.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'api.dart';
 import "custom_color.dart";
 import "form_aduan.dart";
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'detail_unit_layanan.dart';
+import 'images_default.dart';
 import 'qr_scanner.dart';
 import 'dashboard_pengaduan.dart';
 import 'profile_page.dart';
@@ -270,19 +272,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                         :
                                     Column(
                                       children: [
-                                        ...List.generate(aduanTerbaru.length, (index) {
-                                          final aduan = aduanTerbaru[index];
-                                          return _buildPreviewAduanSaya(
-                                            index + 1,
-                                            aduan["judul"],
-                                            aduan["nama_jenis_pengaduan"],
-                                            aduan["tanggal"],
-                                            aduan["nama_status_pengaduan"],
-                                            aduan["lampiran"],
-                                            aduan["image_exist"],
-                                          );
-                                        }),
-                                        _buildTampilkanLebihBanyakButton(const AduanPage()),
+                                        aduanTerbaru.isEmpty
+                                            ? Column(
+                                          children: List.generate(1, (index) => const Center(child: CircularProgressIndicator())),
+                                        )
+                                            : Column(
+                                          children: List.generate(aduanTerbaru.length, (index) {
+                                            final aduan = aduanTerbaru[index];
+                                            return _buildPreviewAduanSaya(
+                                              index + 1,
+                                              aduan["judul"],
+                                              aduan["nama_jenis_pengaduan"],
+                                              aduan["tanggal"],
+                                              aduan["nama_status_pengaduan"],
+                                              aduan["lampiran"],
+                                              aduan["image_exist"],
+                                            );
+                                          }),
+                                        ),
                                       ],
                                     ),
                                     const SizedBox(height: 30),
@@ -360,15 +367,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ),
                                           const SizedBox(height: 10),
                                           Column(children: [
-                                            ...List.generate(3,
+                                            ...List.generate(unitLayanan.length,
                                                 (index) {
                                               final unit = unitLayanan[index];
                                               return _buildUnitLayananPreview(
-                                                  index + 1,
+                                                  int.parse(unit["id_instansi"]),
                                                   unit["nama_instansi"],
-                                                  unit["website"],
+                                                  unit["website"] ?? '-',
                                                   unit["rata_rata_rating"] == 0 ? 0 : int.parse(unit["rata_rata_rating"]),
                                                   unit["total_rating"] == 0 ? 0 : int.parse(unit["total_rating"]),
+                                                  unit["image_exist"],
                                                   unit["gambar_instansi"],
                                                 );
                                             }),
@@ -480,8 +488,7 @@ class _HomeScreenState extends State<HomeScreen> {
       throw Exception('Token tidak ditemukan di SharedPreferences');
     }
 
-    Uri uri = Uri.parse(
-        "https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_unit_layanan_home_app.php");
+    Uri uri = Uri.parse(ApiWicara.fetchDataUnitLayananHomeUrl);
 
     final response = await http.post(
       uri,
@@ -508,8 +515,7 @@ class _HomeScreenState extends State<HomeScreen> {
       throw Exception('Token tidak ditemukan di SharedPreferences');
     }
 
-    Uri uri = Uri.parse(
-        "https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/jumlah_notifikasi_app.php");
+    Uri uri = Uri.parse(ApiWicara.fetchNotificationCountUrl);
 
     final response = await http.post(
       uri,
@@ -534,6 +540,7 @@ class _HomeScreenState extends State<HomeScreen> {
       String website,
       int rataRataRating,
       int totalRating,
+      bool imageExist,
       String lampiran
   ) {
 
@@ -572,12 +579,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         topLeft: Radius.circular(15),
                         topRight: Radius.circular(15),
                       ),
-                      child: Image.network(
-                        "https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/assets/images/instansi/$lampiran",
+                      child: (imageExist
+                          ? Image.network(
+                            lampiran,
+                            width: double.infinity,
+                            height: MediaQuery.of(context).size.height / 4,
+                            fit: BoxFit.cover,)
+                          : Image.asset(
+                        "images/detail_unit_layanan_picture_default.png",
                         width: double.infinity,
                         height: MediaQuery.of(context).size.height / 4,
                         fit: BoxFit.cover,
-                      )),
+                            ))
+                  ),
                   Container(
                     width: double.infinity,
                     height: MediaQuery.of(context).size.height / 4,
@@ -824,8 +838,7 @@ class _HomeScreenState extends State<HomeScreen> {
       throw Exception('Token tidak ditemukan di SharedPreferences');
     }
 
-    Uri uri = Uri.parse(
-        "https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_aduan_terbaru_app.php");
+    Uri uri = Uri.parse(ApiWicara.fetchDataAduanTerbaruUrl);
 
     final response = await http.post(
       uri,
@@ -932,13 +945,13 @@ class _HomeScreenState extends State<HomeScreen> {
               borderRadius: BorderRadius.circular(10), // Set the border radius
               child: imageExist
                   ? Image.network(
-                    "https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/aduan/$lampiran",
+                    lampiran,
                     height: MediaQuery.of(context).size.height / 15,
                     width: MediaQuery.of(context).size.width / 6.5,
                     fit: BoxFit.cover,
                   )
                   : Image.asset(
-                    "images/image_default.png",
+                    DefaultImage.aduanKehilanganPath,
                     height: MediaQuery.of(context).size.height / 15,
                     width: MediaQuery.of(context).size.width / 6.5,
                     fit: BoxFit.cover,
@@ -1055,7 +1068,7 @@ class _HomeScreenState extends State<HomeScreen> {
       throw Exception('Token tidak ditemukan di SharedPreferences');
     }
 
-    Uri url = Uri.parse("https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_user_home_app.php");
+    Uri url = Uri.parse(ApiWicara.fetchUserDataHomeUrl);
     final response = await http.post(
       url,
       headers: {'Content-Type': "application/x-www-form-urlencoded"},
@@ -1070,8 +1083,8 @@ class _HomeScreenState extends State<HomeScreen> {
       user["nama"] = dataProfile["nama"] ?? "Nama tidak ada";
       user["role"] = dataProfile["nama_role"] ?? "Role tidak ditemukan";
       user["profile"] = dataProfile["profile"] != null && dataProfile["profile"].isNotEmpty 
-        ? NetworkImage('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/profile/${dataProfile["profile"]}')
-        : const AssetImage('images/image_default.png');
+        ? NetworkImage(dataProfile["profile"])
+        : const AssetImage(DefaultImage.profilePicturePath);
 
       setState(() {
         userData.add(user);

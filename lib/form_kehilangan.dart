@@ -9,8 +9,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
+import 'api.dart';
 import 'custom_color.dart';
-import 'dashboard_pengaduan.dart';
 
 typedef Progress = Function(double percent);
 
@@ -92,7 +92,7 @@ class _CreateKehilanganFormState extends State<CreateKehilanganForm> {
     );
 
     // Mengirim laporan dan menunggu hasil
-    bool success = await kirimLaporanKehilangan(laporan);
+    bool success = await submitKehilangan(laporan);
 
     // Menangani respons
     if (success) {
@@ -476,9 +476,8 @@ class _CreateKehilanganFormState extends State<CreateKehilanganForm> {
   }
 }
 
-Future<bool> kirimLaporanKehilangan(Laporan laporan) async {
-  var url = Uri.parse(
-      'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/simpan_kehilangan_app.php');
+Future<bool> submitKehilangan(Laporan laporan) async {
+  var url = Uri.parse(ApiWicara.submitKehilanganUrl);
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? token = prefs.getString('token'); // Ambil token yang tersimpan

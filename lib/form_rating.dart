@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'api.dart';
 import "custom_color.dart";
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_rating/flutter_rating.dart';
@@ -74,7 +75,7 @@ class RatingScreenUserState extends State<RatingScreenUser> {
     }
 
     try {
-      Uri url = Uri.parse('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_data_unit_layanan_untuk_rating_app.php');
+      Uri url = Uri.parse(ApiWicara.fetchInstansiInfoUrl);
 
       final response = await http.post(
         url,
@@ -461,7 +462,7 @@ class RatingScreenUserState extends State<RatingScreenUser> {
     }
 
     try {
-      await sendRatingData(
+      await submitRating(
         hideIdentity: hideIdentity!,
         rating: rating,
         review: _reviewController.text,
@@ -518,7 +519,7 @@ class RatingScreenUserState extends State<RatingScreenUser> {
     );
   }
 
-  Future<bool> sendRatingData({
+  Future<bool> submitRating({
     required bool hideIdentity,
     required double rating,
     required String review,
@@ -531,7 +532,7 @@ class RatingScreenUserState extends State<RatingScreenUser> {
       throw Exception('Token tidak ditemukan di SharedPreferences');
     }
 
-    var url = Uri.parse('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/simpan_ulasan_app.php');
+    var url = Uri.parse(ApiWicara.submitRatingUrl);
     var request = http.MultipartRequest('POST', url);
     
     // Setting fields as strings similar to the second code style

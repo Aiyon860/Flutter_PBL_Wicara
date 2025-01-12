@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'api.dart';
 import 'custom_color.dart';
 import 'home.dart';
+import 'images_default.dart';
 import 'profile_page.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -37,7 +39,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _fetchProfileData() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    final url = Uri.parse('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/tampil_profile_app.php');
+    final url = Uri.parse(ApiWicara.fetchProfileDataUrl);
 
     try {
       final response = await http.post(url, body: {'token': token});
@@ -52,10 +54,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           _bioController.text = profileData['bio'] ?? '';
           jenisKelamin =
               profileData['jenis_kelamin'] == 'M' ? 'Laki-Laki' : 'Perempuan';
-          _profileUrl = profileData['profile'] != null &&
-                  profileData['profile'].isNotEmpty
-              ? 'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/profile/${profileData["profile"]}'
-              : null;
+          _profileUrl = profileData['image_exist']
+              ? profileData["profile"]
+              : DefaultImage.profilePicturePath;
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -84,7 +85,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<bool> updateProfile() async {
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('token') ?? '';
-  final url = Uri.parse('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/update_profile_app.php');
+  final url = Uri.parse(ApiWicara.updateProfileUrl);
 
   var request = http.MultipartRequest('POST', url);
   request.fields['token'] = token;

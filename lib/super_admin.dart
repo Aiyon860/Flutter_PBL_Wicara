@@ -5163,7 +5163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _emailController.text = dataProfile['email'] ?? 'Email Tidak Ditemukan';
           _imageUrl = dataProfile['profile'] != null && dataProfile['profile'].isNotEmpty
               ? 'http://10.0.2.2/WICARA_FIX/Wicara_User_Web/backend/profile/${dataProfile["profile"]}'
-              : 'images/image_default.png';
+              : 'images/aduan_kehilangan_picture_default.png';
 
         });
       } else {

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobile_pbl/home.dart';
 import 'package:image_picker/image_picker.dart';
+import 'api.dart';
 import 'custom_color.dart';
 import 'respon_aduan.dart';
 import 'dart:convert'; // Tambahkan ini
@@ -116,8 +117,7 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
       throw Exception('Token tidak ditemukan di SharedPreferences');
     }
 
-    Uri uri = Uri.parse(
-        "https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/tampil_jenis_pengaduan_form_aduan_app.php");
+    Uri uri = Uri.parse(ApiWicara.fetchJenisPengaduanUrl);
 
     final response = await http.post(
       uri,
@@ -146,8 +146,7 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
       throw Exception('Token tidak ditemukan di SharedPreferences');
     }
 
-    Uri uri = Uri.parse(
-        "https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/tampil_instansi_form_aduan_app.php");
+    Uri uri = Uri.parse(ApiWicara.fetchInstansiInfoAduanUrl);
 
     final response = await http.post(
       uri,
@@ -189,7 +188,7 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
     );
 
     // Mengirim laporan dan menunggu hasil
-    bool success = await kirimLaporan(laporan);
+    bool success = await submitAduan(laporan);
 
     // Menangani respons
     if (success) {
@@ -601,8 +600,8 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
   }
 }
 
-Future<bool> kirimLaporan(Laporan laporan) async {
-  var url = Uri.parse('https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/simpan_aduan_app.php');
+Future<bool> submitAduan(Laporan laporan) async {
+  var url = Uri.parse(ApiWicara.submitAduanUrl);
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? token = prefs.getString('token'); // Ambil token yang tersimpan

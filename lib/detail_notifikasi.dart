@@ -3,6 +3,7 @@ import 'package:flutter_mobile_pbl/dashboard_notifikasi.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'api.dart';
 import 'custom_color.dart';
 
 void main() {
@@ -65,8 +66,7 @@ class _DetailNotificationScreenState extends State<DetailNotificationScreen> {
       }
 
       final response = await http.post(
-        Uri.parse(
-            'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/detail_notifikasi_app.php'),
+        Uri.parse(ApiWicara.fetchNotificationDetailUrl),
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: {
           'token': token,

@@ -4,6 +4,7 @@ import 'package:flutter_mobile_pbl/barang_salah.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'api.dart';
 import 'custom_color.dart';
 import 'dashboard_kehilangan.dart';
 
@@ -37,7 +38,7 @@ class DetailPenemuanPage extends StatelessWidget {
       String? token = prefs.getString('token');
 
       final response = await http.post(
-        Uri.parse("https://affe-2404-8000-1038-2bf7-2d22-5e29-a5aa-1532.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/respon_tidak_temuan_app.php"),
+        Uri.parse(ApiWicara.respondNoTemuanUrl),
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: {
           'token': token,
@@ -65,7 +66,7 @@ class DetailPenemuanPage extends StatelessWidget {
       String? token = prefs.getString('token');
 
       final response = await http.post(
-        Uri.parse("https://affe-2404-8000-1038-2bf7-2d22-5e29-a5aa-1532.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/respon_ya_temuan_app.php"),
+        Uri.parse(ApiWicara.respondYesTemuanUrl),
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: {
           'token': token,
@@ -93,7 +94,7 @@ class DetailPenemuanPage extends StatelessWidget {
       String? token = prefs.getString('token');
 
       final response = await http.post(
-        Uri.parse("https://affe-2404-8000-1038-2bf7-2d22-5e29-a5aa-1532.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ganti_status_kehilangan_app.php"),
+        Uri.parse(ApiWicara.changeKehilanganStatusUrl),
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: {
           'token': token,
@@ -272,15 +273,15 @@ class DetailPenemuanPage extends StatelessWidget {
                   onPressed: () async {
                   // Logika tombol batalkan
                     await responYa();
-                  Future.delayed(const Duration(milliseconds: 100), () async {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => BarangBenarScreen(
-                        namaPenemu: nama,
-                        nomorTelepon: nomorTelepon,
-                      )),
-                    );
-                  });
+                    Future.delayed(const Duration(milliseconds: 100), () async {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => BarangBenarScreen(
+                          namaPenemu: nama,
+                          nomorTelepon: nomorTelepon,
+                        )),
+                      );
+                    });
                   },
                   style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,

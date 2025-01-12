@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'api.dart';
 import 'custom_color.dart';
 
 void main() {
@@ -76,8 +77,7 @@ class _AduanPageState extends State<AduanPage> {
 
       // Menggunakan POST request untuk mengirim token
       final response = await http.post(
-        Uri.parse(
-            'https://toucan-outgoing-moderately.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/ambil_pengaduan_app.php'),
+        Uri.parse(ApiWicara.fetchPengaduanAllUrl),
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: {'token': token},
       ).timeout(const Duration(seconds: 5), onTimeout: () {
@@ -304,7 +304,7 @@ class _AduanPageState extends State<AduanPage> {
                 fit: BoxFit.cover,
               )
                   : Image.asset(
-                "images/image_default.png",
+                "images/aduan_kehilangan_picture_default.png",
                 height: MediaQuery.of(context).size.height / 15,
                 width: MediaQuery.of(context).size.width / 6.5,
                 fit: BoxFit.cover,
