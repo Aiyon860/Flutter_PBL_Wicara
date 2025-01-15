@@ -36,10 +36,15 @@ class ResponKehilangan extends StatelessWidget {
       backgroundColor: CustomColor.darkBlue,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        leading: const Icon(
-          Icons.arrow_back_rounded,
-          color: Colors.white,
-          size: 30,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            color: Colors.white,
+            size: 30,
+          ),
+          onPressed: () {
+            Navigator.pushNamed(context, '/dashboard_kehilangan');
+          },
         ),
       ),
       body: Container(
@@ -87,7 +92,7 @@ class ResponKehilangan extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     // Kembali ke dashboard
-                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/dashboard_kehilangan');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: CustomColor.goldColor, // Warna background tombol sama dengan AppBar

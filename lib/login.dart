@@ -82,13 +82,7 @@ class _LoginPageState extends State<LoginPage> {
             _errorMessage = 'berhasil';
           });
 
-          if (data["user"]) {
-            Navigator.pushNamed(context, '/home');
-          } else if (data["super_admin"]) {
-            Navigator.pushNamed(context, '/home_super_admin');
-          } else {
-            Navigator.pushNamed(context, '/home_admin_instansi');
-          }
+          Navigator.pushNamed(context, '/home');
         } else {
           setState(() {
             _errorMessage =
@@ -245,7 +239,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                               ),
-                              if (_errorMessage != null)
+                              if (_errorMessage != null && _errorMessage != 'berhasil')
                                 Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 10),
                                   child: Text(

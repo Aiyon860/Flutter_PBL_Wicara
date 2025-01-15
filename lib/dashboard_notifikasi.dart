@@ -106,10 +106,7 @@ class _NotifikasiScreenState extends State<NotifikasiScreen> {
           icon: const Icon(Icons.arrow_back),
           color: Colors.white,
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => HomeScreen()),
-            );
+            Navigator.pushNamed(context, '/home');
           },
         ),
         title: const Text(
@@ -381,7 +378,9 @@ class NotificationTile extends StatelessWidget {
         child: InkWell(
           onTap: () {
             Future.delayed(const Duration(milliseconds: 100), () async {
-              await changeNotificationStatusToBeRead();
+              if (!isViewed) {
+                await changeNotificationStatusToBeRead();
+              }
               Navigator.pushNamed(
                 context,
                 '/notification_detail',

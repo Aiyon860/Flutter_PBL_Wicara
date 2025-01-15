@@ -32,10 +32,7 @@ class BarangSalahScreen extends StatelessWidget {
             color: Colors.white,
             size: 30,
           ), onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const LostItemsScreen()),
-          );
+          Navigator.pushNamed(context, '/dashboard_kehilangan');
         },
         ),
         centerTitle: true,

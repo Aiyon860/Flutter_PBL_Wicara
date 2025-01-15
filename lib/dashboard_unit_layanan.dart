@@ -150,7 +150,7 @@ class DashboardUnitLayananPageState extends State<DashboardUnitLayananPage> {
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.white),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.pushNamed(context, '/home');
           },
         ),
       ),
@@ -230,7 +230,6 @@ class DashboardUnitLayananPageState extends State<DashboardUnitLayananPage> {
       child: Container(
           margin: const EdgeInsets.only(bottom: 15.0),
           width: double.infinity,
-          height: (MediaQuery.of(context).size.height / 3),
           decoration: BoxDecoration(
               color: CustomColor.liatAduanSayaBgColor,
               borderRadius: const BorderRadius.all(Radius.circular(15)),

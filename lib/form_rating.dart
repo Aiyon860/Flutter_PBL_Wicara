@@ -440,12 +440,12 @@ class RatingScreenUserState extends State<RatingScreenUser> {
         label: const Text(
           "Kirim",
           style: TextStyle(
-            color: Colors.white,
+            color: Colors.black,
             fontWeight: FontWeight.w600,
           ),
         ),
         style: ElevatedButton.styleFrom(
-          backgroundColor: CustomColor.btnGetStartedColor,
+          backgroundColor: CustomColor.goldColor,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(35)),
           ),
@@ -473,6 +473,10 @@ class RatingScreenUserState extends State<RatingScreenUser> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Rating submitted successfully')),
+      );
+
+      Navigator.pushNamed(
+          context, '/home',
       );
 
       // Clear the form or navigate away as needed

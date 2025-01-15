@@ -371,6 +371,7 @@ class _LostItemsScreenState extends State<LostItemsScreen> with SingleTickerProv
                               context,
                               MaterialPageRoute(
                                 builder: (context) => DetailBarangPage(
+                                  tabIndex: _selectedTabIndex,
                                 isOwner: item.milikUser ?? '', // Ubah sesuai kebutuhan
                                 title: item.judul ?? 'Judul Tidak Tersedia',
                                 nama: item.nama ?? 'Nama Tidak Tersedia',

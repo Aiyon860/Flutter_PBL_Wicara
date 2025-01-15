@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_mobile_pbl/home.dart';
 import 'package:image_picker/image_picker.dart';
 import 'api.dart';
 import 'custom_color.dart';
@@ -280,13 +279,7 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
           icon: const Icon(Icons.close, color: Colors.white),
           onPressed: () {
             // Ganti dengan halaman yang ingin dituju
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    const HomeScreen(), // Ganti dengan widget halaman yang Anda inginkan
-              ),
-            );
+            Navigator.pushNamed(context, '/home');
           },
         ),
         backgroundColor: CustomColor.darkBlue,
@@ -531,9 +524,11 @@ class _CreateAduanFormState extends State<CreateAduanForm> {
                           activeColor:
                               Colors.blue, // Warna checkbox saat dicentang
                         ),
-                        const Text(
-                          'Laporan akan disimpan tanpa identitas',
-                          style: TextStyle(fontSize: 14),
+                        Expanded( // Membungkus teks dengan Expanded
+                          child: Text(
+                            'Laporan akan disimpan tanpa identitas',
+                            style: TextStyle(fontSize: 14),
+                          ),
                         ),
                       ],
                     ),

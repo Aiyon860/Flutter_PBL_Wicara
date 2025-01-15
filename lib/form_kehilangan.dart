@@ -184,13 +184,7 @@ class _CreateKehilanganFormState extends State<CreateKehilanganForm> {
           icon: const Icon(Icons.close, color: Colors.white),
           onPressed: () {
             // Ganti dengan halaman yang ingin dituju
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                const HomeScreen(), // Ganti dengan widget halaman yang Anda inginkan
-              ),
-            );
+            Navigator.pushNamed(context, '/home');
           },
         ),
         backgroundColor: CustomColor.darkBlue,
@@ -496,6 +490,7 @@ Future<bool> submitKehilangan(Laporan laporan) async {
     try {
       var file = await http.MultipartFile.fromPath('file', laporan.filePath!);
       request.files.add(file);
+
     } catch (e) {
       print("Error saat menambahkan file: $e");
       return false;

@@ -88,7 +88,7 @@ class DetailPenemuanPage extends StatelessWidget {
     }
   }
 
-  Future<void> responSelesai() async {
+  Future<void> gantiStatusKehilangan() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('token');
@@ -100,6 +100,33 @@ class DetailPenemuanPage extends StatelessWidget {
           'token': token,
           'id_penemuan': nomor,
           'is_penemuan_from_pemilik': "false",
+        },
+      ).timeout(const Duration(seconds: 5), onTimeout: () {
+        throw Exception('Connection timed out');
+      });
+
+      if (response.statusCode == 200) {
+        print(jsonDecode(response.body));
+      } else {
+        throw Exception(
+            'Failed to send data. HTTP Status: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception("Error sending data: $e");
+    }
+  }
+  
+  Future<void> responSelesai() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
+
+      final response = await http.post(
+        Uri.parse(ApiWicara.respondDoneTemuanUrl),
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: {
+          'token': token,
+          'id_penemuan': nomor,
         },
       ).timeout(const Duration(seconds: 5), onTimeout: () {
         throw Exception('Connection timed out');
@@ -130,7 +157,7 @@ class DetailPenemuanPage extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushNamed(context, '/dashboard_kehilangan');
           },
         ),
       ),
@@ -272,7 +299,8 @@ class DetailPenemuanPage extends StatelessWidget {
                   child: ElevatedButton(
                   onPressed: () async {
                   // Logika tombol batalkan
-                    await responYa();
+                    await responYa(); // laporan temuan
+                    await gantiStatusKehilangan();  // laporan kehilangan
                     Future.delayed(const Duration(milliseconds: 100), () async {
                       Navigator.push(
                         context,

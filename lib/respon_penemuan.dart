@@ -26,10 +26,15 @@ class ResponPenemuanScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: CustomColor.darkBlue,
       appBar: AppBar(
-        leading: const Icon(
-          Icons.arrow_back_rounded,
-          color: Colors.white,
-          size: 30,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            color: Colors.white,
+            size: 30,
+          ),
+          onPressed: () {
+            Navigator.pushNamed(context, '/dashboard_kehilangan');
+          },
         ),
         centerTitle: true,
         title: const Text(

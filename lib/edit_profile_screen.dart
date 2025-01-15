@@ -54,9 +54,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           _bioController.text = profileData['bio'] ?? '';
           jenisKelamin =
               profileData['jenis_kelamin'] == 'M' ? 'Laki-Laki' : 'Perempuan';
-          _profileUrl = profileData['image_exist']
+          _profileUrl = profileData['profile'] != null &&
+              profileData['profile'].isNotEmpty
               ? profileData["profile"]
-              : DefaultImage.profilePicturePath;
+              : null;
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -151,13 +152,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             // Ganti dengan halaman yang ingin dituju
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                const ProfilePage(), // Ganti dengan widget halaman yang Anda inginkan
-              ),
-            );
+            Navigator.pushNamed(context, '/profile');
           },
         ),
       ),
@@ -223,7 +218,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
     );
   }
- 
+
  Widget _buildProfileHeader() {
   return GestureDetector(
     onTap: _pickImage,
@@ -244,9 +239,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             radius: 60,
             backgroundImage: _profileImage != null
                 ? FileImage(_profileImage!)
-                : (_profileUrl != null
+                : (_profileUrl != null && _profileUrl != ""
                     ? NetworkImage(_profileUrl!)
-                    : const AssetImage('assets/Profiledefault.png')) as ImageProvider,
+                    : const AssetImage(DefaultImage.profilePicturePath)) as ImageProvider,
             child: Align(
               alignment: Alignment.bottomRight,
               child: Container(

@@ -157,7 +157,7 @@ class _AduanPageState extends State<AduanPage> {
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.white),
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+            Navigator.pushNamed(context, '/home');
           },
         ),
       ),

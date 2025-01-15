@@ -49,7 +49,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List unitLayanan = [];
   List aduanTerbaru = [];
-  List userData = [];
+  String nama = "";
+  String role = "";
+  ImageProvider<Object> profilePicture = const AssetImage(DefaultImage.profilePicturePath);
   int jumlahNotifikasi = 0;
 
   final List<String> imagePaths = [
@@ -79,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const CreateKehilanganForm()),
+          MaterialPageRoute(builder: (context) => const LostItemsScreen()),
         );
         _selectedIndex = 0;
         break;
@@ -160,7 +162,11 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: _buildDrawer(),
       appBar: AppBar(
           backgroundColor: CustomColor.primaryColor,
-          title: TopBar(userData: userData, jumlahNotifikasi: jumlahNotifikasi),
+          title: TopBar(
+              nama: nama,
+              role: role,
+              profilePicture: profilePicture,
+              jumlahNotifikasi: jumlahNotifikasi),
           leading: Builder(builder: (BuildContext context) {
             return IconButton(
               icon: const Icon(
@@ -257,9 +263,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     const SizedBox(height: 10),
                                     aduanTerbaru.isEmpty
-                                        ? Padding(
-                                          padding: const EdgeInsets.only(top: 16.0),
-                                          child: const Center(
+                                        ? const Padding(
+                                          padding: EdgeInsets.only(top: 16.0),
+                                          child: Center(
                                             child: Text(
                                           "Tidak ada aduan",
                                           style: TextStyle(
@@ -277,7 +283,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           children: List.generate(1, (index) => const Center(child: CircularProgressIndicator())),
                                         )
                                             : Column(
-                                          children: List.generate(aduanTerbaru.length, (index) {
+                                          children: List.generate(aduanTerbaru.length > 3 ? 3 : aduanTerbaru.length, (index) {
                                             final aduan = aduanTerbaru[index];
                                             return _buildPreviewAduanSaya(
                                               index + 1,
@@ -285,11 +291,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                               aduan["nama_jenis_pengaduan"],
                                               aduan["tanggal"],
                                               aduan["nama_status_pengaduan"],
-                                              aduan["lampiran"],
+                                              aduan["lampiran"] ?? DefaultImage.aduanKehilanganPath,
                                               aduan["image_exist"],
                                             );
                                           }),
                                         ),
+                                        if (aduanTerbaru.length > 3)
+                                          _buildTampilkanLebihBanyakButton(const AduanPage())
                                       ],
                                     ),
                                     const SizedBox(height: 30),
@@ -367,7 +375,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ),
                                           const SizedBox(height: 10),
                                           Column(children: [
-                                            ...List.generate(unitLayanan.length,
+                                            ...List.generate(unitLayanan.length > 3 ? 3 : unitLayanan.length,
                                                 (index) {
                                               final unit = unitLayanan[index];
                                               return _buildUnitLayananPreview(
@@ -558,7 +566,6 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Container(
           margin: const EdgeInsets.only(bottom: 10.0),
           width: double.infinity,
-          height: (MediaQuery.of(context).size.height / 3),
           decoration: BoxDecoration(
               color: CustomColor.liatAduanSayaBgColor,
               borderRadius: const BorderRadius.all(Radius.circular(15)),
@@ -575,7 +582,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Stack(
                 children: [
                   ClipRRect(
-                      borderRadius: BorderRadius.only(
+                      borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(15),
                         topRight: Radius.circular(15),
                       ),
@@ -660,7 +667,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             const SizedBox(width: 5),
                             Text(
-                              '$totalRating Review' + (totalRating > 1 ? 's' : ''),
+                              '$totalRating Review${totalRating > 1 ? 's' : ''}',
                               style: const TextStyle(
                                 fontSize: 16,
                                 color: CustomColor.liatAduanSayaFontColor,
@@ -691,15 +698,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: const Row(
                         mainAxisSize: MainAxisSize.min, // Minimizes the width of the button
                         children: [
-                          const Text(
+                          Text(
                             "Detail",
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 16, // Optional: Adjust font size
                             ),
                           ),
-                          const SizedBox(width: 4), // Adjust spacing between Text and Icon
-                          const Icon(
+                          SizedBox(width: 4), // Adjust spacing between Text and Icon
+                          Icon(
                             Icons.chevron_right_outlined,
                             color: Colors.black,
                             size: 20, // Adjust size of the icon
@@ -775,6 +782,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         label,
                         style: TextStyle(
+                          fontSize: 12,
                           fontWeight: FontWeight.w500,
                           color: textAndIconColor,
                         ),
@@ -1079,15 +1087,12 @@ class _HomeScreenState extends State<HomeScreen> {
       final data = json.decode(response.body);
       final dataProfile = data["data"];
 
-      var user = <String, dynamic>{};
-      user["nama"] = dataProfile["nama"] ?? "Nama tidak ada";
-      user["role"] = dataProfile["nama_role"] ?? "Role tidak ditemukan";
-      user["profile"] = dataProfile["profile"] != null && dataProfile["profile"].isNotEmpty 
-        ? NetworkImage(dataProfile["profile"])
-        : const AssetImage(DefaultImage.profilePicturePath);
-
       setState(() {
-        userData.add(user);
+        nama = dataProfile["nama"] ?? "Nama tidak ada";
+        role = dataProfile["nama_role"] ?? "Role tidak ditemukan";
+        profilePicture = dataProfile["image_exist"]
+            ? NetworkImage(dataProfile["profile"])
+            : const AssetImage(DefaultImage.profilePicturePath);
       });
 
       return true;
@@ -1106,7 +1111,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.fromLTRB(25, 85, 25, 25),
         child: Column(
           children: [
-            _buildProfPicBodyDrawer(userData[0]["nama"], userData[0]["role"], userData[0]["profile"]),
+            _buildProfPicBodyDrawer(nama, role, profilePicture),
             const Divider(
               color: CustomColor.anotherGrey,
               thickness: 1,
@@ -1119,7 +1124,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildProfPicBodyDrawer(String username, String jabatan, ImageProvider<Object> profpic) {
+  Widget _buildProfPicBodyDrawer(
+      String username,
+      String jabatan,
+      ImageProvider<Object> profpic) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -1220,31 +1228,6 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  "HUBUNGI KAMI",
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Image.asset(
-                      "images/instagram.png",
-                      height: 25,
-                    ),
-                    const SizedBox(width: 10),
-                    Image.asset(
-                      "images/phone.png",
-                      height: 25,
-                    ),
-                    const SizedBox(width: 10),
-                    Image.asset(
-                      "images/mail.png",
-                      height: 25,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 35),
-                const Text(
                   "Jl. Prof. Sudarto, Tembalang, Kec. Tembalang, Kota Semarang, Jawa Tengah 50275",
                   style: TextStyle(
                     color: Colors.white,
@@ -1270,12 +1253,16 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class TopBar extends StatefulWidget {
-  final List userData;
+  final String nama;
+  final String role;
+  final ImageProvider profilePicture;
   final int jumlahNotifikasi;
 
   const TopBar({
     super.key,
-    required this.userData,
+    required this.nama,
+    required this.role,
+    required this.profilePicture,
     required this.jumlahNotifikasi,
   });
 
@@ -1312,7 +1299,7 @@ class _TopBarState extends State<TopBar> {
           children: [
             _buildNotificationIcon(widget.jumlahNotifikasi),
             const SizedBox(width: 10),
-            _buildProfPicIcon(widget.userData),
+            _buildProfPicIcon(widget.profilePicture),
           ],
         ),
       ],
@@ -1364,7 +1351,7 @@ class _TopBarState extends State<TopBar> {
     );
   }
 
-  Widget _buildProfPicIcon(List<dynamic> userData) {
+  Widget _buildProfPicIcon(ImageProvider profilePicture) {
     return InkWell(
       borderRadius: const BorderRadius.all(Radius.circular(5)),
       onTap: () {
@@ -1379,7 +1366,7 @@ class _TopBarState extends State<TopBar> {
           decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(5)),
               image: DecorationImage(
-                image: userData[0]["profile"],
+                image: profilePicture,
                 fit: BoxFit.cover,
               ))),
     );
@@ -1497,7 +1484,7 @@ class _ExpandableMenuItemState extends State<ExpandableMenuItem> {
                         alignment: Alignment.centerLeft,
                       ),
                       child: Text(
-                        "${item.title}",
+                        item.title,
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.black87,

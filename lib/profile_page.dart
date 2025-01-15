@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'custom_color.dart';
 import 'edit_profile_screen.dart';
+import 'images_default.dart';
 import 'login.dart';
 import 'home.dart';
 
@@ -26,7 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String role = '';
   String email = '';
   int notificationCount = 0;
-  ImageProvider<Object> profile = const AssetImage('images/aduan_kehilangan_picture_default.png');
+  ImageProvider<Object> profile = const AssetImage(DefaultImage.profilePicturePath);
 
   @override
   void initState() {
@@ -81,16 +82,16 @@ class _ProfilePageState extends State<ProfilePage> {
           jenisKelamin = 
               dataProfile['jenis_kelamin'] == 'M' ? 'Laki-Laki' 
               : dataProfile['jenis_kelamin'] == 'F' ? 'Perempuan' 
-              : 'Jenis Kelamin Tidak Ditemukan';
+              : '-';
           nomorInduk =
-              dataProfile['nomor_induk'] ?? 'Nomor Induk Tidak Ditemukan';
+              dataProfile['nomor_induk'] ?? '-';
           nomorTelepon =
-              dataProfile['nomor_telepon'] ?? 'Nomor Telepon Tidak Ditemukan';
-          email = dataProfile['email'] ?? 'Email Tidak Ditemukan';
-          role = dataProfile['nama_role'] ?? 'Role Tidak Ditemukan';
-          bio = dataProfile['bio'] ?? 'Bio Tidak Ditemukan';
+              dataProfile['nomor_telepon'] ?? '-';
+          email = dataProfile['email'] ?? '-';
+          role = dataProfile['nama_role'] ?? '-';
+          bio = dataProfile['bio'] ?? '-';
           profile = dataProfile['image_exist']
-            ? NetworkImage(dataProfile['lampiran'])
+            ? NetworkImage(dataProfile['profile'])
             : profile;
         });
       } else {
@@ -145,13 +146,7 @@ class _ProfilePageState extends State<ProfilePage> {
           icon: const Icon(Icons.close, color: Colors.white),
           onPressed: () {
             // Ganti dengan halaman yang ingin dituju
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                const HomeScreen(), // Ganti dengan widget halaman yang Anda inginkan
-              ),
-            );
+            Navigator.pushNamed(context, '/home');
           },
         ),
         actions: [

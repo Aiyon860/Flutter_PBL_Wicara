@@ -114,7 +114,7 @@ class _UploadPenemuanState extends State<UploadPenemuan> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushNamed(context, '/dashboard_kehilangan');
           },
         ),
         title: Text(
@@ -123,54 +123,56 @@ class _UploadPenemuanState extends State<UploadPenemuan> {
         ),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            _buildTextField('Deskripsi', _descriptionController, isMultiline: true),
-            const SizedBox(height: 24),
-            const Text(
-              'Unggah Gambar (Optional)',
-              style: TextStyle(
-                fontSize: 14,
-                fontFamily: 'Poppins',
-                color: Color(0xFFA5A5A5),
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-            const SizedBox(height: 8),
-            GestureDetector(
-              onTap: () {
-                _showImageSourceActionSheet(context);
-              },
-              child: _buildUploadField(),
-            ),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: submitPenemuan,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: CustomColor.goldColor,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                ),
-                child: const Text(
-                  'Kirim',
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.bold,
-                  ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              _buildTextField('Deskripsi', _descriptionController, isMultiline: true),
+              const SizedBox(height: 24),
+              const Text(
+                'Unggah Gambar (Optional)',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'Poppins',
+                  color: Color(0xFFA5A5A5),
+                  fontStyle: FontStyle.italic,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              GestureDetector(
+                onTap: () {
+                  _showImageSourceActionSheet(context);
+                },
+                child: _buildUploadField(),
+              ),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: submitPenemuan,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: CustomColor.goldColor,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                  ),
+                  child: const Text(
+                    'Kirim',
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

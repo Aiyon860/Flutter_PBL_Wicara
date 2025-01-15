@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'api.dart';
 import 'custom_color.dart';
@@ -55,12 +56,17 @@ class QRScannerScreenState extends State<QRScannerScreen>
   }
 
   Future<void> verifyQR(String scannedQR) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
     final url = Uri.parse(ApiWicara.verifyQrUrl); // Pastikan alamat server sesuai
 
     try {
       final response = await http.post(
         url,
-        body: json.encode({'namaQR': scannedQR}),
+        body: json.encode({
+          'namaQR': scannedQR,
+          'token': token,
+        }),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -74,11 +80,20 @@ class QRScannerScreenState extends State<QRScannerScreen>
               '/rating',
               arguments: { 'kode_instansi': scannedQR }
           );
+          cameraController.toggleTorch();
+          cameraController.dispose();
         } else {
-          // QR tidak cocok, tampilkan pesan
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Kode QR tidak valid! $scannedQR')),
-          );
+          if (data["is_limit"]) {
+            // User telah melakukan rating pada instansi tersebut
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(data["message"])),
+            );
+          } else {
+            // QR tidak cocok, tampilkan pesan
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Kode QR tidak valid! $scannedQR')),
+            );
+          }
         }
       } else {
         // Tampilkan pesan jika terjadi kesalahan pada permintaan
@@ -95,8 +110,6 @@ class QRScannerScreenState extends State<QRScannerScreen>
     } finally {
       setState(() {
         hasScanned = false; // reset scanning state
-        cameraController.toggleTorch();
-        cameraController.dispose();
       });
     }
   }

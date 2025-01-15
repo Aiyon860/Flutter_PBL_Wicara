@@ -10,7 +10,7 @@ class ApiWicara {
   static const fetchDataAduanTerbaruUrl = "${baseUrl}ambil_data_aduan_terbaru_app.php";
   static const fetchUserDataHomeUrl = "${baseUrl}ambil_data_user_home_app.php";
   static const fetchInstansiInfoUrl = "${baseUrl}ambil_data_unit_layanan_untuk_rating_app.php";
-  static const submitRatingUrl = "${baseUrl}simpan_ulasan_app.php";
+  static const  submitRatingUrl = "${baseUrl}simpan_ulasan_app.php";
   static const submitPenemuanUrl = "${baseUrl}simpan_penemuan_app.php";
   static const submitKehilanganUrl = "${baseUrl}simpan_kehilangan_app.php";
   static const submitAduanUrl = "${baseUrl}simpan_aduan_app.php";
@@ -20,6 +20,7 @@ class ApiWicara {
   static const fetchDetailUnitLayananUrl = "${baseUrl}ambil_data_detail_unit_layanan_app.php?id_instansi=";
   static const respondNoTemuanUrl = "${baseUrl}respon_tidak_temuan_app.php";
   static const respondYesTemuanUrl = "${baseUrl}respon_ya_temuan_app.php";
+  static const respondDoneTemuanUrl = "${baseUrl}respon_selesai_temuan_app.php";
   static const changeKehilanganStatusUrl = "${baseUrl}ganti_status_kehilangan_app.php";
   static const fetchNotificationDetailUrl = "${baseUrl}detail_notifikasi_app.php";
   static const fetchPengaduanAllUrl = "${baseUrl}ambil_pengaduan_app.php";

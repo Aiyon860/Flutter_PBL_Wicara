@@ -1,12 +1,13 @@
 import "package:flutter/material.dart";
-import "package:flutter_mobile_pbl/admin_instansi.dart";
 import "package:flutter_mobile_pbl/dashboard_kehilangan.dart";
 import "package:flutter_mobile_pbl/detail_notifikasi.dart";
 import "package:flutter_mobile_pbl/form_penemuan.dart";
 import "package:flutter_mobile_pbl/home.dart";
 import "package:flutter_mobile_pbl/profile_page.dart";
-import "package:flutter_mobile_pbl/super_admin.dart";
+import "package:flutter_mobile_pbl/dashboard_pengaduan.dart";
 import "custom_color.dart";
+import "dashboard_notifikasi.dart";
+import "dashboard_unit_layanan.dart";
 import "form_rating.dart";
 import "splash_screen.dart";
 
@@ -31,12 +32,13 @@ class MyApp extends StatelessWidget {
       initialRoute: '/', // Rute awal aplikasi
       routes: {
         '/home': (context) => const HomeScreen(),
-        '/home_super_admin': (context) => const MyHomePageSuperAdmin(),
-        '/home_admin_instansi': (context) => const MyHomePageAdminInstansi(),
+        '/aduan': (context) => const AduanPage(),
         '/rating': (context) => const RatingScreenUser(),
         '/profile': (context) => const ProfilePage(),
+        '/dashboard_notification': (context) => NotifikasiScreen(),
         '/notification_detail': (context) => const DetailNotificationScreen(),
         '/dashboard_kehilangan': (context) => const LostItemsScreen(),
+        '/dashboard_unit_layanan': (context) => const DashboardUnitLayananPage(),
         '/form_penemuan': (context) => const UploadPenemuan(),
       },
     );

@@ -87,7 +87,7 @@ class _UnitLayananScreenState extends State<UnitLayananScreen> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pushNamed(context, '/dashboard_unit_layanan');
             },
           ),
         ),
@@ -289,32 +289,34 @@ class _UnitLayananScreenState extends State<UnitLayananScreen> {
                                         ),
                                       ),
                                       const SizedBox(width: 8),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            displayName,
-                                            style: const TextStyle(fontWeight: FontWeight.bold),
-                                          ),
-                                          // Rating Bintang di bawah nama pengguna
-                                          Row(
-                                            children: List.generate(5, (index) {
-                                              if (index < ulasan['skala_bintang'].floor()) {
-                                                return const Icon(
-                                                  Icons.star,
-                                                  color: Colors.amber,
-                                                  size: 20,
-                                                );
-                                              } else {
-                                                return const Icon(
-                                                  Icons.star_border,
-                                                  color: Colors.amber,
-                                                  size: 20,
-                                                );
-                                              }
-                                            }),
-                                          ),
-                                        ],
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              displayName,
+                                              style: const TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            // Rating Bintang di bawah nama pengguna
+                                            Row(
+                                              children: List.generate(5, (index) {
+                                                if (index < ulasan['skala_bintang'].floor()) {
+                                                  return const Icon(
+                                                    Icons.star,
+                                                    color: Colors.amber,
+                                                    size: 20,
+                                                  );
+                                                } else {
+                                                  return const Icon(
+                                                    Icons.star_border,
+                                                    color: Colors.amber,
+                                                    size: 20,
+                                                  );
+                                                }
+                                              }),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   ),

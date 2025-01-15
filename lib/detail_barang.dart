@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobile_pbl/dashboard_kehilangan.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'api.dart';
 import 'custom_color.dart';
 
 class DetailBarangPage extends StatelessWidget {
+  final int tabIndex;
   final String isOwner;
   final String title;
   final String description;
@@ -20,6 +20,7 @@ class DetailBarangPage extends StatelessWidget {
 
   const DetailBarangPage({
     super.key,
+    required this.tabIndex,
     required this.isOwner,
     required this.title,
     required this.description,
@@ -72,7 +73,7 @@ class DetailBarangPage extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushNamed(context, '/dashboard_kehilangan');
           },
         ),
       ),
@@ -137,16 +138,18 @@ class DetailBarangPage extends StatelessWidget {
                     Text(
                       description,
                     ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Nama Pemilik:',
-                      style: TextStyle(
-                        color: Colors.grey,
+                    if (tabIndex != 3) ...[
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Nama Pemilik:',
+                        style: TextStyle(
+                          color: Colors.grey,
+                        ),
                       ),
-                    ),
-                    Text(
-                      nama,
-                    ),
+                      Text(
+                        nama,
+                      ),
+                    ],
                     const SizedBox(height: 16),
                     const Text(
                       'Tanggal upload:',

@@ -32,7 +32,6 @@ class _DetailNotificationScreenState extends State<DetailNotificationScreen> {
   String pesanNotifikasi = '';
   String kodeNotif = '';
   int idKejadian = 0;
-  int? idPenemuan;
   bool _isDataFetched = false;
 
   @override
@@ -86,7 +85,6 @@ class _DetailNotificationScreenState extends State<DetailNotificationScreen> {
             nama = detailNotification["nama_user"];
             pesanNotifikasi = detailNotification["pesan_notifikasi"];
             kodeNotif = detailNotification["kode_notif"];
-            idPenemuan = detailNotification["id_penemuan"];
           });
         } else {
           print("Error: ${responseData['message'] ?? 'Unknown error'}");
@@ -121,10 +119,7 @@ class _DetailNotificationScreenState extends State<DetailNotificationScreen> {
           icon: const Icon(Icons.arrow_back),
           color: Colors.white,
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => NotifikasiScreen()),
-            );
+            Navigator.pushNamed(context, '/dashboard_notification');
           },
         ),
         title: const Text(

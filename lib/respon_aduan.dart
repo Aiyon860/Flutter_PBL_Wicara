@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'custom_color.dart';
+import 'dashboard_pengaduan.dart';
 import 'home.dart';
 
 void main() {
@@ -35,10 +36,15 @@ class ResponAduan extends StatelessWidget {
       backgroundColor: CustomColor.darkBlue,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        leading: const Icon(
-          Icons.arrow_back_rounded,
-          color: Colors.white,
-          size: 30,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            color: Colors.white,
+            size: 30,
+          ),
+          onPressed: () {
+            Navigator.pushNamed(context, '/aduan');
+          },
         ),
       ),
       body: Container(
@@ -86,7 +92,7 @@ class ResponAduan extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     // Kembali ke dashboard
-                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/aduan');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: CustomColor.goldColor, // Warna background tombol sama dengan AppBar
