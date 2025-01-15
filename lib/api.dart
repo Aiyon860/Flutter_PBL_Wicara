@@ -1,5 +1,5 @@
 class ApiWicara {
-  static const baseUrl = "https://humane-racer-immense.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/";
+  static const baseUrl = "https://bedbug-tidy-halibut.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/api/mobile/";
   static const verifyQrUrl = "${baseUrl}check_qr_app.php";
   static const removeTokenUrl = "${baseUrl}logout_app.php";
   static const fetchProfileDataUrl = "${baseUrl}tampil_profile_app.php";
@@ -20,7 +20,7 @@ class ApiWicara {
   static const fetchDetailUnitLayananUrl = "${baseUrl}ambil_data_detail_unit_layanan_app.php?id_instansi=";
   static const respondNoTemuanUrl = "${baseUrl}respon_tidak_temuan_app.php";
   static const respondYesTemuanUrl = "${baseUrl}respon_ya_temuan_app.php";
-  static const respondDoneTemuanUrl = "${baseUrl}respon_selesai_temuan_app.php";
+  static const  respondDoneTemuanUrl = "${baseUrl}respon_selesai_temuan_app.php";
   static const changeKehilanganStatusUrl = "${baseUrl}ganti_status_kehilangan_app.php";
   static const fetchNotificationDetailUrl = "${baseUrl}detail_notifikasi_app.php";
   static const fetchPengaduanAllUrl = "${baseUrl}ambil_pengaduan_app.php";
@@ -30,5 +30,5 @@ class ApiWicara {
   static const fetchKehilanganSudahDitemukanUrl = "${baseUrl}get_ditemukan_app.php";
   static const fetchTemuanUrl = "${baseUrl}get_temuan_app.php";
   static const fetchRiwayatKehilanganUserUrl = "${baseUrl}get_riwayat_saya_app.php";
-  static const fetchProfilePictureUrl = "https://humane-racer-immense.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/profile/";
+  static const fetchProfilePictureUrl = "https://bedbug-tidy-halibut.ngrok-free.app/WICARA_FIX/Wicara_User_Web/backend/profile/";
 }
